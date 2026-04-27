@@ -6,6 +6,7 @@ import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
 import com.sparta.cch.backofficeproject.product.dto.ProductCreateRequest;
 import com.sparta.cch.backofficeproject.product.dto.ProductCreateResponse;
+import com.sparta.cch.backofficeproject.product.dto.ProductGetDetailResponse;
 import com.sparta.cch.backofficeproject.product.entity.Product;
 import com.sparta.cch.backofficeproject.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,5 +47,19 @@ public class ProductService {
 
         // 저장한 결과를 Response DTO로 바꿔서 반환
         return ProductCreateResponse.of(savedProduct);
+    }
+
+    /**
+     * 상품을 상세(단건) 조회합니다.
+     * @param productId 조회할 상품 ID(고유 식별자)
+     * @return 상품 상세 정보 DTO
+     * @throws ApiException 해당 상품의 ID가 존재하지 않을 경우 PRODUCT_NOT_FOUND 예외 발생
+     */
+    @Transactional(readOnly = true)
+    public ProductGetDetailResponse getDetailProduct(Long productId) {
+        // 상품 단건 조회 (DB에 없으면 404 Not Found 반환)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ApiException(ErrorCode.PRODUCT_NOT_FOUND));
+        return ProductGetDetailResponse.of(product);
     }
 }

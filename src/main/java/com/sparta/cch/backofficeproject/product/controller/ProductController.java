@@ -1,11 +1,9 @@
 package com.sparta.cch.backofficeproject.product.controller;
 
-import com.sparta.cch.backofficeproject.common.exception.ApiException;
-import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
-import com.sparta.cch.backofficeproject.common.session.SessionAdmin;
 import com.sparta.cch.backofficeproject.common.session.SessionConst;
 import com.sparta.cch.backofficeproject.product.dto.ProductCreateRequest;
 import com.sparta.cch.backofficeproject.product.dto.ProductCreateResponse;
+import com.sparta.cch.backofficeproject.product.dto.ProductGetDetailResponse;
 import com.sparta.cch.backofficeproject.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,4 +30,17 @@ public class ProductController {
         // 결과 반환합니다.
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductGetDetailResponse> getDetailProduct(
+        // 단건으로 조회할 id를 가져옵니다.
+        @PathVariable("productId") Long productId) {
+
+        // Service Logic을 호출하여 상품 정보를 가져옵니다.
+        ProductGetDetailResponse response = productService.getDetailProduct(productId);
+
+        // 결과 반환합니다.
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }
