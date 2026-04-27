@@ -1,16 +1,14 @@
 package com.sparta.cch.backofficeproject.admin.controller;
 
-import com.sparta.cch.backofficeproject.admin.dto.AdminResponse;
+import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
 import com.sparta.cch.backofficeproject.admin.dto.AdminSignUpRequest;
+import com.sparta.cch.backofficeproject.admin.dto.AdminSignUpResponse;
 import com.sparta.cch.backofficeproject.admin.service.AdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +25,8 @@ public class AdminController {
      * @return 회원가입 결과 응답
      */
     @PostMapping("/signup")
-    public ResponseEntity<AdminResponse> signUp(@Valid @RequestBody AdminSignUpRequest request) {
-
-        AdminResponse response = adminService.signUp(request);
+    public ResponseEntity<AdminApiResponse<AdminSignUpResponse>> signUp(@Valid @RequestBody AdminSignUpRequest request) {
+        AdminApiResponse<AdminSignUpResponse> response = adminService.signUp(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
