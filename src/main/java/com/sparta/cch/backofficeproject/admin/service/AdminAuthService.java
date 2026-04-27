@@ -1,7 +1,8 @@
 package com.sparta.cch.backofficeproject.admin.service;
 
 import com.sparta.cch.backofficeproject.admin.dto.AdminLoginRequest;
-import com.sparta.cch.backofficeproject.admin.dto.AdminResponse;
+import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
+import com.sparta.cch.backofficeproject.admin.dto.AdminLoginResponse;
 import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import com.sparta.cch.backofficeproject.admin.entity.AdminStatus;
 import com.sparta.cch.backofficeproject.admin.repository.AdminRepository;
@@ -30,7 +31,7 @@ public class AdminAuthService {
      * @return 로그인 결과 응답
      */
     @Transactional(readOnly = true)
-    public AdminResponse login(AdminLoginRequest request, HttpSession session) {
+    public AdminApiResponse<AdminLoginResponse> login(AdminLoginRequest request, HttpSession session) {
         Admin admin = adminRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ApiException(ErrorCode.LOGIN_FAILED));
 
@@ -44,7 +45,13 @@ public class AdminAuthService {
         session.setAttribute(SessionConst.ADMIN_EMAIL, admin.getEmail());
         session.setAttribute(SessionConst.ADMIN_ROLE, admin.getRole().name());
 
-        return AdminResponse.createLoginResponse(admin);
+        AdminLoginResponse data = AdminLoginResponse.create(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "로그인에 성공했습니다.",
+                data
+        );
     }
 
     /**
@@ -54,13 +61,17 @@ public class AdminAuthService {
      * @param session 현재 HTTP 세션
      * @return 로그아웃 결과 응답
      */
-    public AdminResponse logout(HttpSession session) {
-        if (session == null) {
+    public AdminApiResponse<Void> logout(HttpSession session) {
+        if (session == null || session.getAttribute(SessionConst.ADMIN_ID) == null) {
             throw new ApiException(ErrorCode.UNAUTHORIZED);
         }
 
         session.invalidate();
-        return AdminResponse.createLogoutResponse();
+        return AdminApiResponse.success(
+                200,
+                "로그아웃에 성공했습니다.",
+                null
+        );
     }
 
     /**

@@ -1,4 +1,9 @@
 package com.sparta.cch.backofficeproject.customer.repository;
 
-public interface CustomerRepository {
+import com.sparta.cch.backofficeproject.customer.entity.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
+
+    boolean existsByEmail(String email);
 }
