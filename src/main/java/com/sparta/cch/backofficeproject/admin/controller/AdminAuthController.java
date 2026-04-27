@@ -1,9 +1,9 @@
 package com.sparta.cch.backofficeproject.admin.controller;
 
 import com.sparta.cch.backofficeproject.admin.dto.AdminLoginRequest;
-import com.sparta.cch.backofficeproject.admin.dto.AdminResponse;
+import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
+import com.sparta.cch.backofficeproject.admin.dto.AdminLoginResponse;
 import com.sparta.cch.backofficeproject.admin.service.AdminAuthService;
-import com.sparta.cch.backofficeproject.admin.service.AdminService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +28,11 @@ public class AdminAuthController {
      * @return 로그인 결과 응답
      */
     @PostMapping("/login")
-    public ResponseEntity<AdminResponse> login(
+    public ResponseEntity<AdminApiResponse<AdminLoginResponse>> login(
             @Valid @RequestBody AdminLoginRequest request,
             HttpSession session) {
 
-        AdminResponse response = adminAuthService.login(request, session);
+        AdminApiResponse<AdminLoginResponse> response = adminAuthService.login(request, session);
         return ResponseEntity.ok(response);
     }
 
@@ -43,9 +43,9 @@ public class AdminAuthController {
      * @return 로그아웃 결과 응답
      */
     @PostMapping("/logout")
-    public ResponseEntity<AdminResponse> logout(HttpSession session) {
+    public ResponseEntity<AdminApiResponse<Void>> logout(HttpSession session) {
 
-        AdminResponse response = adminAuthService.logout(session);
+        AdminApiResponse<Void> response = adminAuthService.logout(session);
         return ResponseEntity.ok(response);
     }
 

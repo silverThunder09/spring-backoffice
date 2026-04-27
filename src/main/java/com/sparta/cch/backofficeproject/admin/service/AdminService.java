@@ -1,8 +1,9 @@
 package com.sparta.cch.backofficeproject.admin.service;
 
-import com.sparta.cch.backofficeproject.admin.dto.AdminLoginRequest;
-import com.sparta.cch.backofficeproject.admin.dto.AdminResponse;
+import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
+import com.sparta.cch.backofficeproject.admin.dto.AdminLoginResponse;
 import com.sparta.cch.backofficeproject.admin.dto.AdminSignUpRequest;
+import com.sparta.cch.backofficeproject.admin.dto.AdminSignUpResponse;
 import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import com.sparta.cch.backofficeproject.admin.entity.AdminRole;
 import com.sparta.cch.backofficeproject.admin.entity.AdminStatus;
@@ -10,12 +11,12 @@ import com.sparta.cch.backofficeproject.admin.repository.AdminRepository;
 import com.sparta.cch.backofficeproject.common.config.PasswordEncoder;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
-import com.sparta.cch.backofficeproject.common.session.SessionConst;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class AdminService {
      * @return 회원가입 결과 응답
      */
     @Transactional
-    public AdminResponse signUp(AdminSignUpRequest request) {
+    public AdminApiResponse<AdminSignUpResponse> signUp(AdminSignUpRequest request) {
         if (adminRepository.existsByEmail(request.getEmail())) {
             throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
         }
@@ -63,7 +64,13 @@ public class AdminService {
 
         Admin savedAdmin = adminRepository.save(admin);
 
-        return AdminResponse.createSignUpResponse(savedAdmin);
+        AdminSignUpResponse data = AdminSignUpResponse.create(savedAdmin);
+
+        return AdminApiResponse.success(
+                201,
+                "관리자 회원가입 신청이 완료되었습니다. 슈퍼 관리자의 승인을 기다려주세요.",
+                data
+        );
     }
 
 }
