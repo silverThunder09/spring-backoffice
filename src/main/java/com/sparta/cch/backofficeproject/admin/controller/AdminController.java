@@ -65,10 +65,28 @@ public class AdminController {
      * @return 수정된 관리자 정보
      */
     @PutMapping("/{adminId}")
-    public ResponseEntity<AdminApiResponse<AdminUpdateResponse>> updateAdmin(@PathVariable Long adminId ,
-                                                                             @Valid @RequestBody AdminUpdateRequest request) {
+    public ResponseEntity<AdminApiResponse<AdminUpdateResponse>> updateAdmin(
+     @PathVariable Long adminId ,
+     @Valid @RequestBody AdminUpdateRequest request) {
 
         AdminApiResponse<AdminUpdateResponse> response = adminService.updateAdmin(adminId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * 특정 관리자의 상태를 변경합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 상태 변경할 관리자 ID
+     * @param request 변경할 상태 값
+     * @return 변경된 관리자 상태 정보
+     */
+    @PatchMapping("/{adminId}/status")
+    public ResponseEntity<AdminApiResponse<AdminStatusUpdateResponse>> updateAdminStatus(
+             @PathVariable Long adminId,
+             @Valid @RequestBody AdminUpdateStatusRequest request) {
+
+        AdminApiResponse<AdminStatusUpdateResponse> response = adminService.updateAdminStatus(adminId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

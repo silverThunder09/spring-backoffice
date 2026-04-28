@@ -69,4 +69,8 @@ public class Admin extends BaseEntity {
         this.phone = phone;
     }
 
+    public void updateStatus(AdminStatus status) {
+        this.status = status;
+    }
+
 }

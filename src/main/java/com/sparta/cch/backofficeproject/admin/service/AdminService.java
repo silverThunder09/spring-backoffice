@@ -102,10 +102,13 @@ public class AdminService {
                 keyword, request.getRole(), request.getStatus(), pageable
         );
 
+        AdminListResponse data = AdminListResponse.of(adminPage);
+
         return AdminApiResponse.success(
                 200,
                 "관리자 목록 조회에 성공했습니다.",
-                AdminListResponse.of(adminPage));
+                data
+        );
     }
 
 
@@ -155,10 +158,48 @@ public class AdminService {
 
         admin.update(request.getName(), request.getEmail(), request.getPhone());
 
+        AdminUpdateResponse data = AdminUpdateResponse.of(admin);
+
         return AdminApiResponse.success(
                 200,
                 "관리자 정보 수정에 성공했습니다.",
-                AdminUpdateResponse.of(admin)
+                data
+        );
+    }
+
+
+    /**
+     * 특정 관리자의 상태를 변경합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 상태 변경할 관리자 ID
+     * @param request 변경할 상태 값
+     * @return 변경된 관리자 상태 정보
+     * @throws ApiException 관리자가 존재하지 않는 경우 (ADMIN_NOT_FOUND)
+     * @throws ApiException 상태 값이 올바르지 않은 경우 (INVALID_REQUEST)
+     */
+    @Transactional
+    public AdminApiResponse<AdminStatusUpdateResponse> updateAdminStatus(
+            Long adminId,
+            AdminUpdateStatusRequest request
+    ) {
+        Admin admin = findAdminById(adminId);
+
+        AdminStatus status;
+
+        try {
+            status = AdminStatus.valueOf(request.getStatus().trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(ErrorCode.INVALID_ADMIN_STATUS);
+        }
+
+        admin.updateStatus(status);
+        AdminStatusUpdateResponse data = AdminStatusUpdateResponse.of(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "관리자 상태 변경에 성공했습니다.",
+                data
         );
     }
 
