@@ -68,4 +68,18 @@ public class ProductController {
         // 결과 반환합니다.
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PatchMapping("/{productId}/status")
+    public ResponseEntity<ProductStatusUpdateResponse> updateProductStatus(
+            // 단건으로 조회할 id를 가져옵니다.
+            @PathVariable("productId") Long productId,
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @Valid @RequestBody ProductStatusUpdateRequest request) {
+
+        // Service Logic을 호출하여 상품 정보를 가져옵니다.
+        ProductStatusUpdateResponse response = productService.updateProductStatus(productId, request);
+
+        // 결과 반환합니다.
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

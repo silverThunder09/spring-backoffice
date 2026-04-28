@@ -111,4 +111,20 @@ public class ProductService {
         // 결과 반환
         return ProductStockUpdateResponse.of(product);
     }
+
+    /**
+     * 관리자가 직접 상품의 상태를 판매중, 품절, 단종 중 하나로 변경합니다.
+     * @param productId 상태를 변경할 상품의 고유 식별자
+     * @param request 변경할 상태 정보
+     */
+    @Transactional
+    public ProductStatusUpdateResponse updateProductStatus(Long productId, ProductStatusUpdateRequest request) {
+        // 기존 상품 단건 조회 (없으면 404 Not Found 반환)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ApiException(ErrorCode.PRODUCT_NOT_FOUND));
+        // 상태 수동 변경 (JPA Dirty Checking)
+        product.updateStatus(request.getStatus());
+        // 결과 반환
+        return ProductStatusUpdateResponse.of(product);
+    }
 }

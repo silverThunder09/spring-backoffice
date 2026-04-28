@@ -79,4 +79,12 @@ public class Product extends BaseEntity {
             }
         }
     }
+
+    /**
+     * 상품 상태 수동 변경
+     * @param status 변경할 상태 (SALE, SOLD_OUT, DISCONTINUED)
+     */
+    public void updateStatus(ProductStatus status) {
+        this.status = status;
+    }
 }
