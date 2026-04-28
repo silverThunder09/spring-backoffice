@@ -4,6 +4,9 @@ import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import com.sparta.cch.backofficeproject.admin.repository.AdminRepository;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
+import com.sparta.cch.backofficeproject.order.entity.Order;
+import com.sparta.cch.backofficeproject.order.entity.OrderStatus;
+import com.sparta.cch.backofficeproject.order.repository.OrderRepository;
 import com.sparta.cch.backofficeproject.product.dto.*;
 import com.sparta.cch.backofficeproject.product.entity.Product;
 import com.sparta.cch.backofficeproject.product.repository.ProductRepository;
@@ -13,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,9 +25,11 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final AdminRepository adminRepository;
+    private final OrderRepository orderRepository;
 
     /**
      * 새로운 상품을 등록합니다.
+     *
      * @param adminId 세션에서 전달받은 관리자 고유 식별자
      * @param request 상품명, 가격, 재고 등 사용자가 입력한 상품 정보 DTO
      * @return 등록된 상품의 상세 정보를 포함한 응답 DTO
@@ -50,6 +57,7 @@ public class ProductService {
 
     /**
      * 상품을 상세(단건) 조회합니다.
+     *
      * @param productId 조회할 상품 ID(고유 식별자)
      * @return 상품 상세 정보 DTO
      * @throws ApiException 해당 상품의 ID가 존재하지 않을 경우 PRODUCT_NOT_FOUND 예외 발생
@@ -65,6 +73,7 @@ public class ProductService {
     /**
      * 상품 기본 정보를 수정합니다.
      * 관리자 권한을 가진 사용자라면 누구나 상품의 이름, 카테고리, 가격, 설명을 수정할 수 있습니다.
+     *
      * @param productId 수정할 상품의 고유 식별자 (PK)
      * @param request   클라이언트로부터 전달받은 수정 데이터 (DTO)
      * @return ProductUpdateResponse 수정이 완료된 상품 정보와 수정 일시
@@ -96,6 +105,7 @@ public class ProductService {
      * - 재고가 0 이하가 될 경우 : 상태를 품절(SOLD_OUT)로 자동 전환
      * - 재고가 1 이상이 될 경우 : 상태를 판매중(SALE)으로 자동 전환
      * - 단, 현재 상품 상태가 단종(DISCONTINUED)인 경우 상태 변경 로직은 무시됩니다.
+     *
      * @param productId 재고를 변경할 상품의 고유 식별자 (PK)
      * @param request   클라이언트로부터 전달받은 변경할 재고 수량 (DTO)
      * @return ProductStockUpdateResponse 갱신된 재고, 상태 및 수정 일시
@@ -115,7 +125,7 @@ public class ProductService {
     /**
      * 관리자가 직접 상품의 상태를 판매중, 품절, 단종 중 하나로 변경합니다.
      * @param productId 상태를 변경할 상품의 고유 식별자
-     * @param request 변경할 상태 정보
+     * @param request   변경할 상태 정보
      */
     @Transactional
     public ProductStatusUpdateResponse updateProductStatus(Long productId, ProductStatusUpdateRequest request) {
@@ -126,5 +136,43 @@ public class ProductService {
         product.updateStatus(request.getStatus());
         // 결과 반환
         return ProductStatusUpdateResponse.of(product);
+    }
+
+    /**
+     * 특정 상품을 삭제합니다. 단, 연관된 활성 주문이 있을 경우 삭제가 불가능합니다.
+     */
+    @Transactional
+    public ProductDeleteResponse deleteProduct(Long productId) {
+        // 기존 상품 단건 조회 (없으면 404 Not Found 반환)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ApiException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        /**
+         * 비즈니스 검증 로직 (409 Conflict)
+         * 만약 주문 레포지토리가 있다면 409 Conflict Error 반환
+         * 현재는 예시로 '판매중'이면서 '재고가 남아있는' 등의 조건을 체크하거나,
+         * 실제 주문 테이블 조회가 필요합니다. 여기서는 로직의 흐름만 명시합니다.
+         */
+        if (hasActiveOrders(productId)) {
+            throw new ApiException(ErrorCode.PRODUCT_DELETE_CONFLICT); // 409 에러 정의 필요
+        }
+
+        // 검증 완료 후 삭제 처리
+        productRepository.delete(product);
+
+        // 결과 값 반환
+        return ProductDeleteResponse.of(productId);
+    }
+
+    /**
+     * 내부 헬퍼 메서드: 해당 상품에 연결된 '처리 중(활성 상태)'인 주문이 있는지 확인합니다.
+     */
+    private boolean hasActiveOrders(Long productId) {
+        // OrderStatus Enum을 사용하여 '준비중', '배송중' 상태만 필터링합니다.
+        List<OrderStatus> activeStatuses = List.of(
+                OrderStatus.PENDING,   // 준비중
+                OrderStatus.SHIPPING   // 배송중
+        );
+        return orderRepository.existsByProductIdAndStatusIn(productId, activeStatuses);
     }
 }

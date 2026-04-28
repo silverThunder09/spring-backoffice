@@ -82,4 +82,16 @@ public class ProductController {
         // 결과 반환합니다.
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ProductDeleteResponse> deleteProduct(
+            // 단건으로 조히할 id를 가져옵니다.
+            @PathVariable("productId") Long productId,
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId) {
+        // Service Logic을 호출하여 상품을 삭제합니다.
+        ProductDeleteResponse response = productService.deleteProduct(productId);
+
+        // 결과 반환합니다.
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
