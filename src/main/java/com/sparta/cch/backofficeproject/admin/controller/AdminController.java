@@ -42,5 +42,19 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * 특정 관리자의 상세 정보를 조회합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 조회할 관리자 ID
+     * @return 관리자 상세 정보
+     */
+    @GetMapping("/{adminId}")
+    public ResponseEntity<AdminApiResponse<AdminDetailResponse>> getAdmin(@PathVariable Long adminId) {
+
+        AdminApiResponse<AdminDetailResponse> response = adminService.getAdmin(adminId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 }

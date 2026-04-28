@@ -105,4 +105,31 @@ public class AdminService {
         return AdminApiResponse.success(200, "관리자 목록 조회에 성공했습니다.", AdminListResponse.create(adminPage));
     }
 
+
+    /**
+     * 특정 관리자의 상세 정보를 조회합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 조회할 관리자 ID
+     * @return 관리자 상세 정보
+     * @throws ApiException 관리자가 존재하지 않을 경우 (ADMIN_NOT_FOUND)
+     */
+    @Transactional(readOnly = true)
+    public AdminApiResponse<AdminDetailResponse> getAdmin(Long adminId) {
+
+        if (adminId < 1) {
+            throw new ApiException(ErrorCode.INVALID_ADMIN_ID);
+        }
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new ApiException(ErrorCode.ADMIN_NOT_FOUND));
+
+        AdminDetailResponse data = AdminDetailResponse.create(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "관리자 상세 조회에 성공했습니다.",
+                data
+        );
+    }
 }
