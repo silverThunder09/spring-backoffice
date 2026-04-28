@@ -117,4 +117,33 @@ public class OrderController {
 
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 주문 취소 API
+     * <p>
+     * 로그인한 관리자가 특정 주문을 취소합니다.
+     *
+     * @param adminId    세션에 저장된 로그인 관리자 ID
+     * @param orderId    취소할 주문 ID
+     * @param requestDto 주문 취소 요청 DTO
+     * @return 주문 취소 결과 응답
+     */
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<OrderApiResponse<OrderCancelResponseDto>> cancelOrder(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderCancelRequestDto requestDto
+    ) {
+
+        OrderCancelResponseDto responseDto
+                = orderService.cancelOrder(adminId, orderId, requestDto);
+
+        OrderApiResponse<OrderCancelResponseDto> response = OrderApiResponse.success(
+                HttpStatus.OK.value(),
+                "주문 취소 성공",
+                responseDto
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }
