@@ -72,5 +72,8 @@ public class Admin extends BaseEntity {
     public void updateStatus(AdminStatus status) {
         this.status = status;
     }
+    public void updateRole(AdminRole role) {
+        this.role = role;
+    }
 
 }

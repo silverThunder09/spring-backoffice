@@ -82,13 +82,31 @@ public class AdminController {
      * @return 변경된 관리자 상태 정보
      */
     @PatchMapping("/{adminId}/status")
-    public ResponseEntity<AdminApiResponse<AdminStatusUpdateResponse>> updateAdminStatus(
+    public ResponseEntity<AdminApiResponse<AdminUpdateStatusResponse>> updateAdminStatus(
              @PathVariable Long adminId,
              @Valid @RequestBody AdminUpdateStatusRequest request) {
 
-        AdminApiResponse<AdminStatusUpdateResponse> response = adminService.updateAdminStatus(adminId, request);
+        AdminApiResponse<AdminUpdateStatusResponse> response = adminService.updateAdminStatus(adminId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    /**
+     * 특정 관리자의 역할을 변경합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 역할 변경할 관리자 ID
+     * @param request 변경할 역할 값
+     * @return 변경된 관리자 역할 정보
+     */
+    @PatchMapping("/{adminId}/role")
+    public ResponseEntity<AdminApiResponse<AdminUpdateRoleResponse>> updateAdminRole(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminUpdateRoleRequest request) {
+
+        AdminApiResponse<AdminUpdateRoleResponse> response = adminService.updateAdminRole(adminId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 
 }

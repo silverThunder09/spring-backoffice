@@ -179,10 +179,10 @@ public class AdminService {
      * @throws ApiException 상태 값이 올바르지 않은 경우 (INVALID_REQUEST)
      */
     @Transactional
-    public AdminApiResponse<AdminStatusUpdateResponse> updateAdminStatus(
+    public AdminApiResponse<AdminUpdateStatusResponse> updateAdminStatus(
             Long adminId,
-            AdminUpdateStatusRequest request
-    ) {
+            AdminUpdateStatusRequest request) {
+
         Admin admin = findAdminById(adminId);
 
         AdminStatus status;
@@ -194,11 +194,45 @@ public class AdminService {
         }
 
         admin.updateStatus(status);
-        AdminStatusUpdateResponse data = AdminStatusUpdateResponse.of(admin);
+        AdminUpdateStatusResponse data = AdminUpdateStatusResponse.of(admin);
 
         return AdminApiResponse.success(
                 200,
                 "관리자 상태 변경에 성공했습니다.",
+                data
+        );
+    }
+
+    /**
+     * 특정 관리자의 역할을 변경합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 역할 변경할 관리자 ID
+     * @param request 변경할 역할 값
+     * @return 변경된 관리자 역할 정보
+     * @throws ApiException 관리자가 존재하지 않는 경우 (ADMIN_NOT_FOUND)
+     * @throws ApiException 역할 값이 올바르지 않은 경우 (INVALID_ROLE)
+     */
+    @Transactional
+    public AdminApiResponse<AdminUpdateRoleResponse> updateAdminRole(
+            Long adminId,
+            AdminUpdateRoleRequest request) {
+        Admin admin = findAdminById(adminId);
+
+        AdminRole role;
+
+        try {
+            role = AdminRole.valueOf(request.getRole().trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(ErrorCode.INVALID_ROLE);
+        }
+
+        admin.updateRole(role);
+        AdminUpdateRoleResponse data = AdminUpdateRoleResponse.of(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "관리자 역할 변경에 성공했습니다.",
                 data
         );
     }
@@ -218,5 +252,6 @@ public class AdminService {
         return adminRepository.findById(adminId)
                 .orElseThrow(() -> new ApiException(ErrorCode.ADMIN_NOT_FOUND));
     }
+
 
 }

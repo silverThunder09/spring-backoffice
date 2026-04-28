@@ -7,23 +7,24 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class AdminStatusUpdateResponse {
+public class AdminUpdateRoleResponse {
     private final Long adminId;
-    private final String status;
+    private final String role;
     private final LocalDateTime updatedAt;
 
     @Builder
-    public AdminStatusUpdateResponse(Long adminId, String status, LocalDateTime updatedAt) {
+    public AdminUpdateRoleResponse(Long adminId, String role, LocalDateTime updatedAt) {
         this.adminId = adminId;
-        this.status = status;
+        this.role = role;
         this.updatedAt = updatedAt;
     }
 
-    public static AdminStatusUpdateResponse of(Admin admin) {
-        return AdminStatusUpdateResponse.builder()
+    public static AdminUpdateRoleResponse of(Admin admin) {
+        return AdminUpdateRoleResponse.builder()
                 .adminId(admin.getId())
-                .status(admin.getStatus().name())
+                .role(admin.getRole().name())
                 .updatedAt(admin.getUpdatedAt())
                 .build();
     }
+
 }
