@@ -1,9 +1,7 @@
 package com.sparta.cch.backofficeproject.product.controller;
 
 import com.sparta.cch.backofficeproject.common.session.SessionConst;
-import com.sparta.cch.backofficeproject.product.dto.ProductCreateRequest;
-import com.sparta.cch.backofficeproject.product.dto.ProductCreateResponse;
-import com.sparta.cch.backofficeproject.product.dto.ProductGetDetailResponse;
+import com.sparta.cch.backofficeproject.product.dto.*;
 import com.sparta.cch.backofficeproject.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,4 +41,17 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PutMapping("/{productId}")
+    public ResponseEntity<ProductUpdateResponse> updateProduct(
+            // 단건으로 조회할 id를 가져옵니다.
+            @PathVariable("productId") Long productId,
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @Valid @RequestBody ProductUpdateRequest request) {
+
+        // Service Login을 호출하여 상품 정보를 가져옵니다.
+        ProductUpdateResponse response = productService.updateProduct(productId, request);
+
+        // 결과 반환합니다.
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
