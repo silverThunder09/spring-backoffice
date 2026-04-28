@@ -56,5 +56,21 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * 특정 관리자의 정보를 수정합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 수정할 관리자 ID
+     * @param request 수정할 이름, 이메일, 전화번호
+     * @return 수정된 관리자 정보
+     */
+    @PutMapping("/{adminId}")
+    public ResponseEntity<AdminApiResponse<AdminUpdateResponse>> updateAdmin(@PathVariable Long adminId ,
+                                                                             @Valid @RequestBody AdminUpdateRequest request) {
+
+        AdminApiResponse<AdminUpdateResponse> response = adminService.updateAdmin(adminId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 }

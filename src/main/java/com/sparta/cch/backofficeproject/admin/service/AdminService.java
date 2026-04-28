@@ -102,7 +102,10 @@ public class AdminService {
                 keyword, request.getRole(), request.getStatus(), pageable
         );
 
-        return AdminApiResponse.success(200, "관리자 목록 조회에 성공했습니다.", AdminListResponse.of(adminPage));
+        return AdminApiResponse.success(
+                200,
+                "관리자 목록 조회에 성공했습니다.",
+                AdminListResponse.of(adminPage));
     }
 
 
@@ -117,12 +120,7 @@ public class AdminService {
     @Transactional(readOnly = true)
     public AdminApiResponse<AdminDetailResponse> getAdmin(Long adminId) {
 
-        if (adminId < 1) {
-            throw new ApiException(ErrorCode.INVALID_ADMIN_ID);
-        }
-
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new ApiException(ErrorCode.ADMIN_NOT_FOUND));
+        Admin admin = findAdminById(adminId);
 
         AdminDetailResponse data = AdminDetailResponse.of(admin);
 
@@ -132,4 +130,52 @@ public class AdminService {
                 data
         );
     }
+
+    /**
+     * 특정 관리자의 정보를 수정합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 수정할 관리자 ID
+     * @param request 수정할 이름, 이메일, 전화번호
+     * @return 수정된 관리자 정보
+     * @throws ApiException 관리자 ID가 1 미만인 경우 (INVALID_ADMIN_ID)
+     * @throws ApiException 관리자가 존재하지 않는 경우 (ADMIN_NOT_FOUND)
+     * @throws ApiException 이메일이 중복된 경우 (DUPLICATED_EMAIL)
+     */
+    @Transactional
+    public AdminApiResponse<AdminUpdateResponse> updateAdmin(Long adminId, AdminUpdateRequest request) {
+
+        Admin admin = findAdminById(adminId);
+
+        // 본인 이메일 제외하고 중복 체크
+        if (!admin.getEmail().equals(request.getEmail())
+                && adminRepository.existsByEmail(request.getEmail())) {
+            throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
+        }
+
+        admin.update(request.getName(), request.getEmail(), request.getPhone());
+
+        return AdminApiResponse.success(
+                200,
+                "관리자 정보 수정에 성공했습니다.",
+                AdminUpdateResponse.of(admin)
+        );
+    }
+
+    /**
+     * 관리자 ID로 관리자를 조회합니다.
+     *
+     * @param adminId 조회할 관리자 ID
+     * @return 관리자 엔티티
+     * @throws ApiException ID가 1 미만인 경우 (INVALID_ADMIN_ID)
+     * @throws ApiException 관리자가 존재하지 않는 경우 (ADMIN_NOT_FOUND)
+     */
+    private Admin findAdminById(Long adminId) {
+        if (adminId < 1) {
+            throw new ApiException(ErrorCode.INVALID_ADMIN_ID);
+        }
+        return adminRepository.findById(adminId)
+                .orElseThrow(() -> new ApiException(ErrorCode.ADMIN_NOT_FOUND));
+    }
+
 }
