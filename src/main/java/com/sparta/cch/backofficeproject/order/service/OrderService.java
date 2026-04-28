@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.sparta.cch.backofficeproject.product.enums.ProductStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import java.time.LocalDateTime;
@@ -44,6 +45,7 @@ public class OrderService {
      * 현재는
      * Product, Customer, Admin 연관 로직은 다음 단계에서 채웁니다.
      */
+    @Transactional
     public OrderCreateResponseDto createOrder(OrderCreateRequestDto requestDto, Long adminId) {
 
         if (adminId == null || adminId < 1) {
@@ -74,6 +76,8 @@ public class OrderService {
         if (product.getStock() < requestDto.getQuantity()) {
             throw new ApiException(ErrorCode.INSUFFICIENT_STOCK);
         }
+
+        product.updateStock(product.getStock() - requestDto.getQuantity());
 
         String orderNo = generateUniqueOrderNo();
 
@@ -301,6 +305,65 @@ public class OrderService {
                 .orderNo(savedOrder.getOrderNo())
                 .previousStatus(previousStatus)
                 .currentStatus(savedOrder.getStatus())
+                .updatedAt(savedOrder.getUpdatedAt())
+                .build();
+    }
+
+    /**
+     * 주문을 취소합니다.
+     * <p>
+     * 로그인한 관리자가 특정 주문을 취소합니다.
+     *
+     * @param adminId    세션에 저장된 로그인 관리자 ID
+     * @param orderId    취소할 주문 ID
+     * @param requestDto 주문 취소 요청 DTO
+     * @return 주문 취소 결과 응답
+     */
+    @Transactional
+    public OrderCancelResponseDto cancelOrder(
+            Long adminId,
+            Long orderId,
+            OrderCancelRequestDto requestDto
+    ) {
+
+        if (adminId == null || adminId < 1) {
+            throw new ApiException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (orderId == null || orderId < 1) {
+            throw new ApiException(ErrorCode.INVALID_ORDER_ID);
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ApiException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (requestDto.getCancelReason() == null || requestDto.getCancelReason().isBlank()) {
+            throw new ApiException(ErrorCode.REQUIRED_CANCEL_REASON);
+        }
+
+        OrderStatus previousStatus = order.getStatus();
+
+        if (previousStatus == OrderStatus.CANCELED) {
+            throw new ApiException(ErrorCode.ALREADY_CANCELED_ORDER);
+        }
+
+        if (previousStatus != OrderStatus.PENDING) {
+            throw new ApiException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
+        }
+
+        order.cancel(requestDto.getCancelReason());
+
+        Product product = order.getProduct();
+        product.updateStock(product.getStock() + order.getQuantity());
+
+        Order savedOrder = orderRepository.save(order);
+
+        return OrderCancelResponseDto.builder()
+                .id(savedOrder.getId())
+                .orderNo(savedOrder.getOrderNo())
+                .previousStatus(previousStatus)
+                .currentStatus(savedOrder.getStatus())
+                .cancelReason(savedOrder.getCancelReason())
                 .updatedAt(savedOrder.getUpdatedAt())
                 .build();
     }

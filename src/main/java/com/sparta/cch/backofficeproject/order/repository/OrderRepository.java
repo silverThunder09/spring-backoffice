@@ -8,12 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * 주문 엔티티에 접근하는 Repository 인터페이스
  */
 public interface OrderRepository extends JpaRepository<Order, Long> {
+
+    boolean existsByProductIdAndStatusIn(Long productId, List<OrderStatus> statuses);
 
     /**
      * 주문번호로 주문을 조회합니다.
@@ -36,10 +39,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param pageable 페이징 및 정렬 정보
      * @return 주문 목록 페이지
      */
-    /**
-     * 주문 목록을 가져오는데, 상태값이 있으면 상태로 걸러주고,
-     * 검색어가 있으면 주문번호나 고객명으로 검색해서 가져와라
-     */
     @Query("""
     SELECT o
     FROM Order o
@@ -53,7 +52,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     """)
     Page<Order> findOrders(
             @Param("keyword") String keyword,
-            @Param("status")OrderStatus status,
+            @Param("status") OrderStatus status,
             Pageable pageable
-            );
+    );
 }
