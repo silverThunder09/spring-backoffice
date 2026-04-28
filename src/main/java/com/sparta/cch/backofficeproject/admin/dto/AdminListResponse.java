@@ -25,10 +25,10 @@ public class AdminListResponse {
         this.totalPages = totalPages;
     }
 
-    public static AdminListResponse create(Page<Admin> adminPage) {
+    public static AdminListResponse of(Page<Admin> adminPage) {
 
         List<AdminListItemResponse> admins = adminPage.getContent().stream()
-                .map(AdminListItemResponse::create)
+                .map(AdminListItemResponse::of)
                 .toList();
 
         return AdminListResponse.builder()

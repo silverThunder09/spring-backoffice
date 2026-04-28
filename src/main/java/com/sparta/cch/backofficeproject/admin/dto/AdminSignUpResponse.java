@@ -39,7 +39,7 @@ public class AdminSignUpResponse {
         this.updatedAt = updatedAt;
     }
 
-    public static AdminSignUpResponse create(Admin admin) {
+    public static AdminSignUpResponse of(Admin admin) {
         return AdminSignUpResponse.builder()
                 .adminId(admin.getId())
                 .name(admin.getName())

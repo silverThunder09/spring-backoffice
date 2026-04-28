@@ -39,7 +39,7 @@ public class AdminListItemResponse {
         this.approvedAt = approvedAt;
     }
 
-    public static AdminListItemResponse create(Admin admin) {
+    public static AdminListItemResponse of(Admin admin) {
         return AdminListItemResponse.builder()
                 .adminId(admin.getId())
                 .name(admin.getName())

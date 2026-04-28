@@ -21,7 +21,7 @@ public class AdminLoginResponse {
         this.status = status;
     }
 
-    public static AdminLoginResponse create(Admin admin) {
+    public static AdminLoginResponse of(Admin admin) {
         return AdminLoginResponse.builder()
                 .adminId(admin.getId())
                 .email(admin.getEmail())

@@ -40,7 +40,7 @@ public class AdminDetailResponse {
         this.approvedAt = approvedAt;
     }
 
-    public static AdminDetailResponse create(Admin admin) {
+    public static AdminDetailResponse of(Admin admin) {
         return AdminDetailResponse.builder()
                 .adminId(admin.getId())
                 .name(admin.getName())

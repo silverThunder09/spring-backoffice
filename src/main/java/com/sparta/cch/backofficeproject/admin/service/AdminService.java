@@ -63,7 +63,7 @@ public class AdminService {
 
         Admin savedAdmin = adminRepository.save(admin);
 
-        AdminSignUpResponse data = AdminSignUpResponse.create(savedAdmin);
+        AdminSignUpResponse data = AdminSignUpResponse.of(savedAdmin);
 
         return AdminApiResponse.success(
                 201,
@@ -102,7 +102,7 @@ public class AdminService {
                 keyword, request.getRole(), request.getStatus(), pageable
         );
 
-        return AdminApiResponse.success(200, "관리자 목록 조회에 성공했습니다.", AdminListResponse.create(adminPage));
+        return AdminApiResponse.success(200, "관리자 목록 조회에 성공했습니다.", AdminListResponse.of(adminPage));
     }
 
 
@@ -124,7 +124,7 @@ public class AdminService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new ApiException(ErrorCode.ADMIN_NOT_FOUND));
 
-        AdminDetailResponse data = AdminDetailResponse.create(admin);
+        AdminDetailResponse data = AdminDetailResponse.of(admin);
 
         return AdminApiResponse.success(
                 200,
