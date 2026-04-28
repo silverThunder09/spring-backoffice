@@ -19,7 +19,7 @@ public class AdminSignUpRequest {
 
     @NotBlank(message = "전화번호는 필수입니다.")
     @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "전화번호는 010-XXXX-XXXX 형식이어야 합니다.")
-    private String phoneNumber;
+    private String phone;
 
     @NotBlank(message = "역할은 필수입니다.")
     private String role;

@@ -25,7 +25,7 @@ public class Admin extends BaseEntity {
     private String email;
 
     @Column(nullable = false, length = 20)
-    private String phoneNumber;
+    private String phone;
 
     @Column(nullable = false, length = 200)
     private String password;
@@ -44,21 +44,21 @@ public class Admin extends BaseEntity {
 
     private String rejectReason;
 
-    public Admin(String name, String email, String phoneNumber, String password, AdminStatus status, AdminRole role) {
+    public Admin(String name, String email, String phone, String password, AdminStatus status, AdminRole role) {
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.password = password;
         this.status = status;
         this.role = role;
     }
 
-    public static Admin signUp(String name, String email, String phoneNumber, String password, AdminStatus status, AdminRole role) {
-        return new Admin(name, email, phoneNumber, password, status, role);
+    public static Admin signUp(String name, String email, String phone, String password, AdminStatus status, AdminRole role) {
+        return new Admin(name, email, phone, password, status, role);
     }
 
-    public static Admin createSuperAdmin(String name, String email, String phoneNumber, String password) {
-        Admin admin = new Admin(name, email, phoneNumber, password, AdminStatus.ACTIVE, AdminRole.SUPER);
+    public static Admin createSuperAdmin(String name, String email, String phone, String password) {
+        Admin admin = new Admin(name, email, phone, password, AdminStatus.ACTIVE, AdminRole.SUPER);
         admin.approvedAt = LocalDateTime.now();
         return admin;
     }

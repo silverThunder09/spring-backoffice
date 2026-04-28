@@ -44,7 +44,7 @@ public class AdminListItemResponse {
                 .adminId(admin.getId())
                 .name(admin.getName())
                 .email(admin.getEmail())
-                .phone(admin.getPhoneNumber())
+                .phone(admin.getPhone())
                 .role(admin.getRole().name())
                 .status(admin.getStatus().name())
                 .createdAt(admin.getCreatedAt())

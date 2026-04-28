@@ -23,16 +23,16 @@ public class Customer extends BaseEntity {
     private String email;
 
     @Column(nullable = false, length = 20)
-    private String phoneNumber;
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CustomerStatus status;
 
-    public Customer(String name, String email, String phoneNumber, CustomerStatus status) {
+    public Customer(String name, String email, String phone, CustomerStatus status) {
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.status = status;
     }
 }
