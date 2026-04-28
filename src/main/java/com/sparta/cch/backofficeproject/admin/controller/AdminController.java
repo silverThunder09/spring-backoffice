@@ -123,5 +123,21 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * 신규 관리자의 가입 신청을 거부합니다.
+     * PENDING 상태의 관리자만 거부할 수 있습니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 거부할 관리자 ID
+     * @param request 거부 사유
+     * @return 거부된 관리자 정보
+     */
+    @PostMapping("/{adminId}/reject")
+    public ResponseEntity<AdminApiResponse<AdminRejectResponse>> rejectAdmin(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminRejectRequest request) {
 
+        AdminApiResponse<AdminRejectResponse> response = adminService.rejectAdmin(adminId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

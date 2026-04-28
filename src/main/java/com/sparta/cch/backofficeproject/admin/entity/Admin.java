@@ -2,6 +2,7 @@ package com.sparta.cch.backofficeproject.admin.entity;
 
 import com.sparta.cch.backofficeproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -82,6 +83,13 @@ public class Admin extends BaseEntity {
         this.approvedAt = LocalDateTime.now();
         this.rejectedAt = null;
         this.rejectReason = null;
+    }
+
+    public void reject(String rejectReason) {
+        this.status = AdminStatus.REJECTED;
+        this.approvedAt = LocalDateTime.now();
+        this.rejectedAt = LocalDateTime.now();
+        this.rejectReason = rejectReason;
     }
 
 }
