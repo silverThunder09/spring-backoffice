@@ -238,6 +238,45 @@ public class AdminService {
     }
 
     /**
+     * 관지라의 가입 신청을 승인합니다.
+     * PENDING 상태의 관리자만 승인할 수 있습니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 승할 관리자 ID
+     * @return 승인된 관리자 정보
+     * @throws ApiException 관리자가 존재하지 않을 경우 (ADMIN_NOT_FOUND)
+     * * @throws ApiException 이미 승인된 관리자인 경우 (ALREADY_APPROVED_ADMIN)
+     * * @throws ApiException 이미 거부된 관리자인 경우 (ALREADY_REJECTED_ADMIN)
+     * * @throws ApiException PENDING 상태가 아닌 경우 (INVALID_REQUEST)
+     */
+    public AdminApiResponse<AdminApproveResponse> approveAdmin(Long adminId) {
+
+        Admin admin = findAdminById(adminId);
+
+        // PENDING 상태가 아니면 예외 처리
+        if (admin.getStatus() == AdminStatus.ACTIVE) {
+            throw new ApiException(ErrorCode.ALREADY_APPROVED_ADMIN);
+        }
+
+        if (admin.getStatus() == AdminStatus.REJECTED) {
+            throw new ApiException(ErrorCode.ALREADY_REJECTED_ADMIN);
+        }
+
+        if (admin.getStatus() != AdminStatus.PENDING) {
+            throw new ApiException(ErrorCode.INVALID_REQUEST, "승인대기 상태의 관리자만 승인할 수 있습니다.");
+        }
+
+        admin.approve();
+        AdminApproveResponse data = AdminApproveResponse.of(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "관리자 승인 처리에 성공했습니다.",
+                data
+        );
+    }
+
+    /**
      * 관리자 ID로 관리자를 조회합니다.
      *
      * @param adminId 조회할 관리자 ID
@@ -252,6 +291,7 @@ public class AdminService {
         return adminRepository.findById(adminId)
                 .orElseThrow(() -> new ApiException(ErrorCode.ADMIN_NOT_FOUND));
     }
+
 
 
 }

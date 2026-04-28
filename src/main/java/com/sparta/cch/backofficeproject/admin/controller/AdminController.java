@@ -108,5 +108,20 @@ public class AdminController {
     }
 
 
+    /**
+     * 신규 관리자의 가입 신청을 승인합니다.
+     * PENDING 상태의 관리자만 승인할 수 있습니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 승인할 관리자 ID
+     * @return 승인된 관리자 정보
+     */
+    @PostMapping("/{adminId}/approve")
+    public ResponseEntity<AdminApiResponse<AdminApproveResponse>> approveAdmin(@PathVariable Long adminId) {
+
+        AdminApiResponse<AdminApproveResponse> response = adminService.approveAdmin(adminId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 }
