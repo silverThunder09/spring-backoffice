@@ -240,6 +240,72 @@ public class OrderService {
     }
 
     /**
+     * 주문 상태를 변경합니다
+     * <p>
+     * 로그인한 관리자가 특정 주문의 상태를 변경합니다.
+     *
+     * @param adminId    세션에 저장된 로그인 관리자 ID
+     * @param orderId    상태를 변경할 주문 ID
+     * @param requestDto 주문 상태 변경 요청 DTO
+     * @return 주문 상태 변경 결과 응답
+     */
+    public OrderStatusUpdateResponseDto updateOrderStatus(
+            Long adminId,
+            Long orderId,
+            OrderStatusUpdateRequestDto requestDto
+    ) {
+
+        if (adminId == null || adminId < 1) {
+            throw new ApiException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (orderId == null || orderId < 1) {
+            throw new ApiException(ErrorCode.INVALID_ORDER_ID);
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ApiException(ErrorCode.ORDER_NOT_FOUND));
+
+        OrderStatus newStatus;
+
+        try {
+            newStatus = OrderStatus.valueOf(requestDto.getStatus());
+        } catch (IllegalArgumentException exception) {
+            throw new ApiException(ErrorCode.INVALID_ORDER_STATUS);
+        }
+
+        OrderStatus previousStatus = order.getStatus();
+
+        if (previousStatus == OrderStatus.COMPLETED) {
+            throw new ApiException(ErrorCode.COMPLETED_ORDER_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        if (previousStatus == OrderStatus.CANCELED) {
+            throw new ApiException(ErrorCode.CANCELED_ORDER_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        if (previousStatus == OrderStatus.PENDING && newStatus != OrderStatus.SHIPPING) {
+            throw new ApiException(ErrorCode.INVALID_ORDER_TRANSITION);
+        }
+
+        if (previousStatus == OrderStatus.SHIPPING && newStatus != OrderStatus.COMPLETED) {
+            throw new ApiException(ErrorCode.INVALID_ORDER_TRANSITION);
+        }
+
+        order.changeStatus(newStatus);
+
+        Order savedOrder = orderRepository.save(order);
+
+        return OrderStatusUpdateResponseDto.builder()
+                .id(savedOrder.getId())
+                .orderNo(savedOrder.getOrderNo())
+                .previousStatus(previousStatus)
+                .currentStatus(savedOrder.getStatus())
+                .updatedAt(savedOrder.getUpdatedAt())
+                .build();
+    }
+
+    /**
      * 주문번호를 생성합니다.
      * 예: ORD-20260427-153000
      */
