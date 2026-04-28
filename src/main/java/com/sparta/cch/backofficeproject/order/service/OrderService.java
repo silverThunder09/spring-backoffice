@@ -200,6 +200,46 @@ public class OrderService {
     }
 
     /**
+     * 주문 상세 정보를 조회합니다.
+     *
+     * 로그인한 관리자가 특정 주문의 상세 정보를 조회합니다.
+     *
+     * @param adminId 세션에 저장된 로그인 관리자 ID
+     * @param orderId 조회할 주문 ID
+     * @return 주문 상세 조회 결과 응답
+     */
+    public OrderDetailResponseDto getOrder(Long adminId, Long orderId) {
+
+        if (adminId == null || adminId < 1) {
+            throw new ApiException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (orderId == null || orderId < 1) {
+            throw new ApiException(ErrorCode.INVALID_ORDER_ID);
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ApiException(ErrorCode.ORDER_NOT_FOUND));
+
+        return OrderDetailResponseDto.builder()
+                .id(order.getId())
+                .orderNo(order.getOrderNo())
+                .customerId(order.getCustomer().getId())
+                .customerName(order.getCustomer().getName())
+                .customerEmail(order.getCustomer().getEmail())
+                .productId(order.getProduct().getId())
+                .productName(order.getProduct().getName())
+                .quantity(order.getQuantity())
+                .totalPrice(order.getTotalPrice())
+                .status(order.getStatus())
+                .orderedAt(order.getOrderedAt())
+                .adminId(order.getAdmin() != null ? order.getAdmin().getId() : null)
+                .adminName(order.getAdmin() != null ? order.getAdmin().getName() : null)
+                .cancelReason(order.getCancelReason())
+                .build();
+    }
+
+    /**
      * 주문번호를 생성합니다.
      * 예: ORD-20260427-153000
      */
