@@ -90,4 +90,25 @@ public class ProductService {
         // 3. 수정된 Entity를 응답 DTO로 매핑하여 반환함.
         return ProductUpdateResponse.of(product);
     }
+
+    /**
+     * 상품 재고 변경 및 상태를 자동으로 갱신합니다.
+     * - 재고가 0 이하가 될 경우 : 상태를 품절(SOLD_OUT)로 자동 전환
+     * - 재고가 1 이상이 될 경우 : 상태를 판매중(SALE)으로 자동 전환
+     * - 단, 현재 상품 상태가 단종(DISCONTINUED)인 경우 상태 변경 로직은 무시됩니다.
+     * @param productId 재고를 변경할 상품의 고유 식별자 (PK)
+     * @param request   클라이언트로부터 전달받은 변경할 재고 수량 (DTO)
+     * @return ProductStockUpdateResponse 갱신된 재고, 상태 및 수정 일시
+     * @throws ApiException 해당 ID의 상품이 존재하지 않을 경우 PRODUCT_NOT_FOUND(404) 발생
+     */
+    @Transactional
+    public ProductStockUpdateResponse updateProductStock(Long productId, ProductStockUpdateRequest request) {
+        // 기존 상품 단건 조회 (없으면 404 Not Found 반환)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ApiException(ErrorCode.PRODUCT_NOT_FOUND));
+        // 재고 변경 및 상태 자동 갱신 (JPA Dirty Checking)
+        product.updateStock(request.getStock());
+        // 결과 반환
+        return ProductStockUpdateResponse.of(product);
+    }
 }

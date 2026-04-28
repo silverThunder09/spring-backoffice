@@ -62,4 +62,21 @@ public class Product extends BaseEntity {
         this.price = price;
         this.description = description;
     }
+
+    /**
+     * 상품 재고 변경 및 상태 자동 갱신 로직
+     * @param newStock 변경할 재고 수량
+     */
+    public void updateStock(Integer newStock) {
+        this.stock = newStock;
+
+        // 상태 자동 갱신
+        if (this.status != ProductStatus.DISCONTINUED) {
+            if (this.stock == 0) {
+                this.status = ProductStatus.SOLD_OUT; // 가용 재고 0이면 품절
+            } else if (this.stock > 0) {
+                this.status = ProductStatus.SALE; // 가용 재고 1 이상이면 판매중
+            }
+        }
+    }
 }
