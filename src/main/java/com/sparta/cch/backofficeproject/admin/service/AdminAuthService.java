@@ -45,7 +45,7 @@ public class AdminAuthService {
         session.setAttribute(SessionConst.ADMIN_EMAIL, admin.getEmail());
         session.setAttribute(SessionConst.ADMIN_ROLE, admin.getRole().name());
 
-        AdminLoginResponse data = AdminLoginResponse.create(admin);
+        AdminLoginResponse data = AdminLoginResponse.of(admin);
 
         return AdminApiResponse.success(
                 200,

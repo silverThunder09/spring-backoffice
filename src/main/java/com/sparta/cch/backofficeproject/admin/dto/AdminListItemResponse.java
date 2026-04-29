@@ -3,23 +3,23 @@ package com.sparta.cch.backofficeproject.admin.dto;
 import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class AdminSignUpResponse {
-
-    private final Long adminId;
-    private final String name;
-    private final String email;
-    private final String phone;
-    private final String role;
-    private final String status;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+public class AdminListItemResponse {
+    private Long adminId;
+    private String name;
+    private String email;
+    private String phone;
+    private String role;
+    private String status;
+    private LocalDateTime createdAt;
+    private LocalDateTime approvedAt;
 
     @Builder
-    public AdminSignUpResponse(
+    public AdminListItemResponse(
             Long adminId,
             String name,
             String email,
@@ -27,8 +27,8 @@ public class AdminSignUpResponse {
             String role,
             String status,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
-    ) {
+            LocalDateTime approvedAt)
+    {
         this.adminId = adminId;
         this.name = name;
         this.email = email;
@@ -36,11 +36,11 @@ public class AdminSignUpResponse {
         this.role = role;
         this.status = status;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.approvedAt = approvedAt;
     }
 
-    public static AdminSignUpResponse of(Admin admin) {
-        return AdminSignUpResponse.builder()
+    public static AdminListItemResponse of(Admin admin) {
+        return AdminListItemResponse.builder()
                 .adminId(admin.getId())
                 .name(admin.getName())
                 .email(admin.getEmail())
@@ -48,8 +48,7 @@ public class AdminSignUpResponse {
                 .role(admin.getRole().name())
                 .status(admin.getStatus().name())
                 .createdAt(admin.getCreatedAt())
-                .updatedAt(admin.getUpdatedAt())
+                .approvedAt(admin.getApprovedAt())
                 .build();
     }
 }
-
