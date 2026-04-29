@@ -35,5 +35,11 @@ public class Customer extends BaseEntity {
         this.phone = phone;
         this.status = status;
     }
+
+    public void update(String name, String email, String phone) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+    }
 }
 

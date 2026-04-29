@@ -4,9 +4,7 @@ import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
 import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
-import com.sparta.cch.backofficeproject.customer.dto.CustomerDetailResponse;
-import com.sparta.cch.backofficeproject.customer.dto.CustomerListRequest;
-import com.sparta.cch.backofficeproject.customer.dto.CustomerListResponse;
+import com.sparta.cch.backofficeproject.customer.dto.*;
 import com.sparta.cch.backofficeproject.customer.entity.Customer;
 import com.sparta.cch.backofficeproject.customer.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -103,4 +101,35 @@ public class CustomerService {
                 .orElseThrow(() -> new ApiException(ErrorCode.CUSTOMER_NOT_FOUND));
     }
 
+    /**
+     * 고객 ID로 특정 고객의 기본 정보를 수정합니다.
+     *
+     * <p>고객 ID 유효성을 검증하고, 이메일 중복 여부를 확인한 뒤
+     * 이름, 이메일, 전화번호를 수정합니다.</p>
+     *
+     * @param customerId 수정할 고객 ID
+     * @param request 고객 정보 수정 요청 데이터
+     * @return 고객 정보 수정 결과 응답
+     */
+    @Transactional
+    public AdminApiResponse<CustomerUpdateResponse> updateCustomer(Long customerId, CustomerUpdateRequest request) {
+
+        Customer customer = findCustomerById(customerId);
+
+        // 본인 이메일 제외하고 중복 체크
+        if (!customer.getEmail().equals(request.getEmail())
+                && customerRepository.existsByEmail(request.getEmail())) {
+            throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
+        }
+
+        customer.update(request.getName(), request.getEmail(), request.getPhone());
+
+        CustomerUpdateResponse data = CustomerUpdateResponse.of(customer);
+
+        return AdminApiResponse.success(
+                200,
+                "고객 정보 수정에 성공했습니다.",
+                data
+        );
+    }
 }
