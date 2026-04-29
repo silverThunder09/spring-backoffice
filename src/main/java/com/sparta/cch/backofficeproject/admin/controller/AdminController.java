@@ -192,4 +192,21 @@ public class AdminController {
         AdminApiResponse<AdminMyProfileResponse> response = adminService.getMyProfile(sessionAdminId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    /**
+     * 로그인한 관리자의 내 프로필 정보를 수정합니다.
+     *
+     * @param sessionAdminId 현재 로그인한 관리자 ID
+     * @param request 수정할 이름, 이메일, 전화번호
+     * @return 내 프로필 수정 결과 응답
+     */
+    @PutMapping("/me")
+    public ResponseEntity<AdminApiResponse<AdminMyProfileUpdateResponse>> updateMyProfile(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long sessionAdminId,
+            @Valid @RequestBody AdminMyProfileUpdateRequest request
+    ) {
+        AdminApiResponse<AdminMyProfileUpdateResponse> response = adminService.updateMyProfile(sessionAdminId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

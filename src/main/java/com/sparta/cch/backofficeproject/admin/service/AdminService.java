@@ -9,6 +9,7 @@ import com.sparta.cch.backofficeproject.common.config.PasswordEncoder;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -426,4 +427,42 @@ public class AdminService {
         );
     }
 
+
+    /**
+     * 로그인한 관리자의 내 프로필 정보를 수정합니다.
+     *
+     * <p>세션에 저장된 관리자 ID로 현재 로그인한 관리자를 조회하고,
+     * 이메일 중복 여부를 확인한 뒤 이름, 이메일, 전화번호를 수정합니다.</p>
+     *
+     * @param sessionAdminId 현재 로그인한 관리자 ID
+     * @param request 수정할 이름, 이메일, 전화번호
+     * @return 내 프로필 수정 결과 응답
+     */
+    @Transactional
+    public AdminApiResponse<AdminMyProfileUpdateResponse> updateMyProfile(
+            Long sessionAdminId,
+            AdminMyProfileUpdateRequest request
+    ) {
+        Admin admin = findAdminById(sessionAdminId);
+
+        // 본인 이메일 제외하고 중복 체크
+        if (!admin.getEmail().equals(request.getEmail())
+                && adminRepository.existsByEmail(request.getEmail())) {
+            throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
+        }
+
+        admin.update(
+                request.getName(),
+                request.getEmail(),
+                request.getPhone()
+        );
+
+        AdminMyProfileUpdateResponse data = AdminMyProfileUpdateResponse.of(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "내 프로필 수정에 성공했습니다.",
+                data
+        );
+    }
 }
