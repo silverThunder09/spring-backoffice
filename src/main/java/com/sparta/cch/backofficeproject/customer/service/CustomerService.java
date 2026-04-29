@@ -6,7 +6,9 @@ import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
 import com.sparta.cch.backofficeproject.customer.dto.*;
 import com.sparta.cch.backofficeproject.customer.entity.Customer;
+import com.sparta.cch.backofficeproject.customer.entity.CustomerStatus;
 import com.sparta.cch.backofficeproject.customer.repository.CustomerRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -129,6 +131,40 @@ public class CustomerService {
         return AdminApiResponse.success(
                 200,
                 "고객 정보 수정에 성공했습니다.",
+                data
+        );
+    }
+
+    /**
+     * 고객 ID로 특정 고객의 상태를 변경합니다.
+     *
+     * <p>고객 ID 유효성을 검증하고 고객을 조회 후 상태를 변경합니다.
+     *
+     * @param customerId 상태를 변경할 고객 ID
+     * @param request 고객 상태 변경 요청 데이터
+     * @return 고객 상태 변경 결과 응답
+     */
+    @Transactional
+    public AdminApiResponse<CustomerStatusUpdateResponse> updateCustomerStatus(
+            Long customerId,
+            CustomerStatusUpdateRequest request
+    ) {
+        Customer customer = findCustomerById(customerId);
+
+        CustomerStatus status;
+
+        try {
+            status = CustomerStatus.valueOf(request.getStatus().trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw  new ApiException(ErrorCode.INVALID_CUSTOMER_STATUS);
+        }
+
+        customer.updateStatus(status);
+        CustomerStatusUpdateResponse data = CustomerStatusUpdateResponse.of(customer);
+
+        return AdminApiResponse.success(
+                200,
+                "고객 상태 변경에 성공했습니다.",
                 data
         );
     }

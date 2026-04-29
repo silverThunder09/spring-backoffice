@@ -61,5 +61,22 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * 고객 ID로 특정 고객의 상태를 변경합니다.
+     *
+     * @param customerId 상태를 변경할 고객 ID
+     * @param request 고객 상태 변경 요청 데이터
+     * @return 고객 상태 변경 결과 응답
+     */
+    @PatchMapping("/{customerId}/status")
+    public ResponseEntity<AdminApiResponse<CustomerStatusUpdateResponse>> updateCustomerStatus(
+            @PathVariable Long customerId,
+            @Valid @RequestBody CustomerStatusUpdateRequest request
+    ) {
+        AdminApiResponse<CustomerStatusUpdateResponse> response = customerService.updateCustomerStatus(customerId, request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }
 
