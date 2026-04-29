@@ -1,6 +1,10 @@
 package com.sparta.cch.backofficeproject.customer.service;
 
 import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
+import com.sparta.cch.backofficeproject.admin.entity.Admin;
+import com.sparta.cch.backofficeproject.common.exception.ApiException;
+import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
+import com.sparta.cch.backofficeproject.customer.dto.CustomerDetailResponse;
 import com.sparta.cch.backofficeproject.customer.dto.CustomerListRequest;
 import com.sparta.cch.backofficeproject.customer.dto.CustomerListResponse;
 import com.sparta.cch.backofficeproject.customer.entity.Customer;
@@ -57,4 +61,46 @@ public class CustomerService {
                 data
         );
     }
+
+    /**
+     * 고객 ID로 특정 고객의 상세 정보를 조회합니다.
+     *
+     * <p>고객 ID 유효성을 검증한 뒤 고객을 조회하고,
+     * 조회된 엔티티를 상세 응답 DTO로 변환하여 반환합니다.</p>
+     *
+     * @param customerId 조회할 고객 ID
+     * @return 고객 상세 조회 결과 응답
+     */
+    @Transactional(readOnly = true)
+    public AdminApiResponse<CustomerDetailResponse> getCustomer(Long customerId) {
+
+        Customer customer = findCustomerById(customerId);
+
+        CustomerDetailResponse data = CustomerDetailResponse.of(customer);
+
+        return AdminApiResponse.success(
+                200,
+                "고객 상세 조회에 성공했습니다.",
+                data
+        );
+    }
+
+
+    /**
+     * 고객 ID로 고객을 조회합니다.
+     *
+     * @param customerId 조회할 고객 ID
+     * @return 조회된 고객 엔티티
+     * @throws ApiException 고객 ID가 1 미만이거나 null인 경우 (INVALID_CUSTOMER_ID)
+     * @throws ApiException 고객이 존재하지 않는 경우 (CUSTOMER_NOT_FOUND)
+     */
+    private Customer findCustomerById(Long customerId) {
+        if (customerId == null || customerId < 1) {
+            throw new ApiException(ErrorCode.INVALID_CUSTOMER_ID);
+        }
+
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new ApiException(ErrorCode.CUSTOMER_NOT_FOUND));
+    }
+
 }
