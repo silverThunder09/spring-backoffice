@@ -4,15 +4,19 @@ import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import com.sparta.cch.backofficeproject.admin.repository.AdminRepository;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
-import com.sparta.cch.backofficeproject.order.entity.Order;
 import com.sparta.cch.backofficeproject.order.entity.OrderStatus;
 import com.sparta.cch.backofficeproject.order.repository.OrderRepository;
 import com.sparta.cch.backofficeproject.product.dto.*;
 import com.sparta.cch.backofficeproject.product.entity.Product;
+import com.sparta.cch.backofficeproject.product.enums.ProductCategory;
+import com.sparta.cch.backofficeproject.product.enums.ProductStatus;
 import com.sparta.cch.backofficeproject.product.repository.ProductRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -174,5 +178,23 @@ public class ProductService {
                 OrderStatus.SHIPPING   // 배송중
         );
         return orderRepository.existsByProductIdAndStatusIn(productId, activeStatuses);
+    }
+
+    @Transactional(readOnly = true)
+        public ProductPageResponse getProducts(String keyword, int page, int size, String sortBy, String sortOrder, ProductCategory category, ProductStatus status) {
+
+            // 정렬 설정
+            Sort.Direction direction = sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+            Pageable pageable = PageRequest.of(page - 1, size, Sort.by(direction, sortBy));
+
+            // 조회
+            Page<Product> productPage = productRepository.findProductsWithFilters(keyword, category, status, pageable);
+
+            // 결과가 없으면 404 에러
+            if (productPage.isEmpty()) {
+                throw new ApiException(ErrorCode.NOT_FOUND);
+            }
+
+            return ProductPageResponse.of(productPage);
     }
 }
