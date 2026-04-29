@@ -140,4 +140,21 @@ public class AdminController {
         AdminApiResponse<AdminRejectResponse> response = adminService.rejectAdmin(adminId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    /**
+     * 특정 관리자를 삭제합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     *
+     * @param adminId 삭제할 관리자 ID
+     * @param sessionAdminId 현재 로그인한 슈퍼 관리자 ID
+     * @return 삭제된 관리자 ID
+     */
+    @DeleteMapping("/{adminId}")
+    public ResponseEntity<AdminApiResponse<AdminDeleteResponse>> deleteAdmin(
+            @PathVariable Long adminId,
+            @SessionAttribute(name = "ADMIN_ID") Long sessionAdminId) {
+
+        AdminApiResponse<AdminDeleteResponse> response = adminService.deleteAdmin(adminId, sessionAdminId);
+        return ResponseEntity.ok(response);
+    }
 }

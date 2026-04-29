@@ -298,6 +298,34 @@ public class AdminService {
     }
 
     /**
+     * 특정 관리자를 삭제합니다.
+     * 슈퍼 관리자만 접근할 수 있습니다.
+     * 본인 계정은 삭제할 수 없습니다.
+     *
+     * @param adminId 삭제할 관리자 ID
+     * @param sessionAdminId 현재 로그인한 슈퍼 관리자 ID
+     * @return 삭제된 관리자 ID
+     * @throws ApiException 관리자가 존재하지 않는 경우 (ADMIN_NOT_FOUND)
+     * @throws ApiException 본인 계정을 삭제하려는 경우 (INVALID_REQUEST)
+     */
+    @Transactional
+    public AdminApiResponse<AdminDeleteResponse> deleteAdmin(Long adminId, Long sessionAdminId) {
+
+        if (adminId.equals(sessionAdminId)) {
+            throw new ApiException(ErrorCode.INVALID_REQUEST, "본인 계정은 삭제할 수 없습니다.");
+        }
+
+        Admin admin = findAdminById(adminId);
+        adminRepository.delete(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "관리자 삭제에 성공했습니다.",
+                AdminDeleteResponse.of(adminId)
+        );
+    }
+
+    /**
      * 관리자 ID로 관리자를 조회합니다.
      *
      * @param adminId 조회할 관리자 ID
