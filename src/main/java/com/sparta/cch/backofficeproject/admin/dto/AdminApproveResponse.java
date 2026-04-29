@@ -1,5 +1,6 @@
 package com.sparta.cch.backofficeproject.admin.dto;
 
+
 import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +8,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class AdminSignUpResponse {
+public class AdminApproveResponse {
 
     private final Long adminId;
     private final String name;
@@ -16,10 +17,11 @@ public class AdminSignUpResponse {
     private final String role;
     private final String status;
     private final LocalDateTime createdAt;
+    private final LocalDateTime approvedAt;
     private final LocalDateTime updatedAt;
 
     @Builder
-    public AdminSignUpResponse(
+    public AdminApproveResponse(
             Long adminId,
             String name,
             String email,
@@ -27,8 +29,9 @@ public class AdminSignUpResponse {
             String role,
             String status,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
-    ) {
+            LocalDateTime approvedAt,
+            LocalDateTime updatedAt) {
+
         this.adminId = adminId;
         this.name = name;
         this.email = email;
@@ -36,11 +39,12 @@ public class AdminSignUpResponse {
         this.role = role;
         this.status = status;
         this.createdAt = createdAt;
+        this.approvedAt = approvedAt;
         this.updatedAt = updatedAt;
     }
 
-    public static AdminSignUpResponse of(Admin admin) {
-        return AdminSignUpResponse.builder()
+    public static AdminApproveResponse of(Admin admin) {
+        return AdminApproveResponse.builder()
                 .adminId(admin.getId())
                 .name(admin.getName())
                 .email(admin.getEmail())
@@ -48,8 +52,8 @@ public class AdminSignUpResponse {
                 .role(admin.getRole().name())
                 .status(admin.getStatus().name())
                 .createdAt(admin.getCreatedAt())
+                .approvedAt(admin.getApprovedAt())
                 .updatedAt(admin.getUpdatedAt())
                 .build();
     }
 }
-

@@ -9,10 +9,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
 @Getter
+@SQLDelete(sql = "UPDATE products SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
 
@@ -43,6 +49,9 @@ public class Product extends BaseEntity {
 
     @Column(length = 255)
     private String description;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @Builder
     public Product(Admin admin, String name, ProductCategory category, Integer price, Integer stock, ProductStatus status, String description) {
@@ -86,5 +95,12 @@ public class Product extends BaseEntity {
      */
     public void updateStatus(ProductStatus status) {
         this.status = status;
+    }
+
+    /**
+     * 논리 삭제 헬퍼 메서드
+     */
+    public void deleted() {
+        this.deletedAt = LocalDateTime.now();
     }
 }
