@@ -299,7 +299,7 @@ public class AdminService {
     }
 
     /**
-     * 특정 관리자를 삭제합니다.
+     * 특정 관리자를 삭제합니다. (Soft Delete)
      * 슈퍼 관리자만 접근할 수 있습니다.
      * 본인 계정은 삭제할 수 없습니다.
      *
@@ -401,4 +401,29 @@ public class AdminService {
             throw new ApiException(ErrorCode.INVALID_REQUEST, "승인대기 상태의 관리자만 처리할 수 있습니다.");
         }
     }
+
+    
+    /**
+     * 로그인한 관리자의 내 프로필 정보를 조회합니다.
+     *
+     * <p>세션에 저장된 관리자 ID로 현재 로그인한 관리자를 조회하고,
+     * 조회된 엔티티를 내 프로필 응답 DTO로 변환하여 반환합니다.</p>
+     *
+     * @param sessionAdminId 현재 로그인한 관리자 ID
+     * @return 내 프로필 조회 결과 응답
+     */
+    @Transactional(readOnly = true)
+    public AdminApiResponse<AdminMyProfileResponse> getMyProfile(Long sessionAdminId) {
+
+        Admin admin = findAdminById(sessionAdminId);
+
+        AdminMyProfileResponse data = AdminMyProfileResponse.of(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "내 프로필 조회에 성공했습니다.",
+                data
+        );
+    }
+
 }

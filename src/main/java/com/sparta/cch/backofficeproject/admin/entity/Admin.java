@@ -2,7 +2,6 @@ package com.sparta.cch.backofficeproject.admin.entity;
 
 import com.sparta.cch.backofficeproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
