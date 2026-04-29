@@ -33,7 +33,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/admins/signup",
                         "/api/admins/login",
                         "/api/admins/password",
-                        "/api/admins/customers/**"
+                        "/api/admins/customers/**",
+                        "/api/admins/me"
                 );
     }
 }
