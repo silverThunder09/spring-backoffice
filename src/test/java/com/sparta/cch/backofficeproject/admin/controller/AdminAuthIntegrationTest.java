@@ -42,7 +42,7 @@ class AdminAuthIntegrationTest {
                   "name": "관리자",
                   "email": "cs01@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-1234-5678",
+                  "phone": "010-1234-5678",
                   "role": "cs"
                 }
                 """;
@@ -79,7 +79,7 @@ class AdminAuthIntegrationTest {
                   "name": "관리자",
                   "email": "duplicated@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-1234-5678",
+                  "phone": "010-1234-5678",
                   "role": "CS"
                 }
                 """;
@@ -101,7 +101,7 @@ class AdminAuthIntegrationTest {
                   "name": "관리자",
                   "email": "super-test@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-1234-5678",
+                  "phone": "010-1234-5678",
                   "role": "SUPER"
                 }
                 """;
@@ -123,7 +123,7 @@ class AdminAuthIntegrationTest {
                   "name": "운영관리자",
                   "email": "operation01@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-2222-3333",
+                  "phone": "010-2222-3333",
                   "role": "operation"
                 }
                 """;

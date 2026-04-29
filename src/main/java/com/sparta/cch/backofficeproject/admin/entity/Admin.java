@@ -2,6 +2,7 @@ package com.sparta.cch.backofficeproject.admin.entity;
 
 import com.sparta.cch.backofficeproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class Admin extends BaseEntity {
     private String email;
 
     @Column(nullable = false, length = 20)
-    private String phoneNumber;
+    private String phone;
 
     @Column(nullable = false, length = 200)
     private String password;
@@ -44,23 +45,55 @@ public class Admin extends BaseEntity {
 
     private String rejectReason;
 
-    public Admin(String name, String email, String phoneNumber, String password, AdminStatus status, AdminRole role) {
+    public Admin(String name, String email, String phone, String password, AdminStatus status, AdminRole role) {
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
         this.password = password;
         this.status = status;
         this.role = role;
     }
 
-    public static Admin signUp(String name, String email, String phoneNumber, String password, AdminStatus status, AdminRole role) {
-        return new Admin(name, email, phoneNumber, password, status, role);
+    public static Admin signUp(String name, String email, String phone, String password, AdminStatus status, AdminRole role) {
+        return new Admin(name, email, phone, password, status, role);
     }
 
-    public static Admin createSuperAdmin(String name, String email, String phoneNumber, String password) {
-        Admin admin = new Admin(name, email, phoneNumber, password, AdminStatus.ACTIVE, AdminRole.SUPER);
+    public static Admin createSuperAdmin(String name, String email, String phone, String password) {
+        Admin admin = new Admin(name, email, phone, password, AdminStatus.ACTIVE, AdminRole.SUPER);
         admin.approvedAt = LocalDateTime.now();
         return admin;
+    }
+
+    public void update(String name, String email, String phone) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+    }
+
+    public void updateStatus(AdminStatus status) {
+        this.status = status;
+    }
+
+    public void updateRole(AdminRole role) {
+        this.role = role;
+    }
+
+    public void approve() {
+        this.status = AdminStatus.ACTIVE;
+        this.approvedAt = LocalDateTime.now();
+        this.rejectedAt = null;
+        this.rejectReason = null;
+    }
+
+    public void reject(String rejectReason) {
+        this.status = AdminStatus.REJECTED;
+        this.approvedAt = LocalDateTime.now();
+        this.rejectedAt = LocalDateTime.now();
+        this.rejectReason = rejectReason;
+    }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 
 }

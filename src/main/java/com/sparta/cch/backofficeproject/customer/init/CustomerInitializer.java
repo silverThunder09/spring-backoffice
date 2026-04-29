@@ -32,7 +32,7 @@ public class CustomerInitializer implements CommandLineRunner {
     private void createCustomerIfNotExists(
             String name,
             String email,
-            String phoneNumber,
+            String phone,
             CustomerStatus status
     ) {
         if (customerRepository.existsByEmail(email)) {
@@ -42,7 +42,7 @@ public class CustomerInitializer implements CommandLineRunner {
         Customer customer = new Customer(
                 name,
                 email,
-                phoneNumber,
+                phone,
                 status
         );
 
