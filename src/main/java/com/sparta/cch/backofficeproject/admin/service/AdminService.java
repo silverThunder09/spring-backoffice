@@ -9,7 +9,6 @@ import com.sparta.cch.backofficeproject.common.config.PasswordEncoder;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,7 +34,7 @@ public class AdminService {
      */
     @Transactional
     public AdminApiResponse<AdminSignUpResponse> signUp(AdminSignUpRequest request) {
-        if (adminRepository.existsByEmail(request.getEmail())) {
+        if (adminRepository.existsByEmailIncludeDeleted(request.getEmail()) == 1) {
             throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
         }
 
@@ -154,7 +153,7 @@ public class AdminService {
 
         // 본인 이메일 제외하고 중복 체크
         if (!admin.getEmail().equals(request.getEmail())
-                && adminRepository.existsByEmail(request.getEmail())) {
+                && adminRepository.existsByEmailIncludeDeleted(request.getEmail()) == 1) {
             throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
         }
 
@@ -447,7 +446,7 @@ public class AdminService {
 
         // 본인 이메일 제외하고 중복 체크
         if (!admin.getEmail().equals(request.getEmail())
-                && adminRepository.existsByEmail(request.getEmail())) {
+                && adminRepository.existsByEmailIncludeDeleted(request.getEmail()) == 1) {
             throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
         }
 
