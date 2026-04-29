@@ -2,6 +2,8 @@ package com.sparta.cch.backofficeproject.admin.controller;
 
 import com.sparta.cch.backofficeproject.admin.dto.*;
 import com.sparta.cch.backofficeproject.admin.service.AdminService;
+import com.sparta.cch.backofficeproject.common.session.SessionConst;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -152,9 +154,28 @@ public class AdminController {
     @DeleteMapping("/{adminId}")
     public ResponseEntity<AdminApiResponse<AdminDeleteResponse>> deleteAdmin(
             @PathVariable Long adminId,
-            @SessionAttribute(name = "ADMIN_ID") Long sessionAdminId) {
+            @SessionAttribute(SessionConst.ADMIN_ID) Long sessionAdminId) {
 
         AdminApiResponse<AdminDeleteResponse> response = adminService.deleteAdmin(adminId, sessionAdminId);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 로그인한 관리자의 비밀번호를 변경합니다.
+     * 비밀번호 변경 후 세션이 무효화됩니다.
+     *
+     * @param sessionAdminId 현재 로그인한 관리자 ID
+     * @param request 현재 비밀번호, 새 비밀번호, 새 비밀번호 확인
+     * @param session 현재 HTTP 세션
+     * @return 비밀번호 변경 결과 응답
+     */
+    @PatchMapping("/password")
+    public ResponseEntity<AdminApiResponse<Void>> changePassword(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long sessionAdminId,
+            @Valid @RequestBody AdminChangePasswordRequest request,
+            HttpSession session) {
+
+        AdminApiResponse<Void> response = adminService.changePassword(sessionAdminId, request, session);
         return ResponseEntity.ok(response);
     }
 }

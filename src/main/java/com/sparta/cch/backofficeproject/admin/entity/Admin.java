@@ -92,4 +92,8 @@ public class Admin extends BaseEntity {
         this.rejectReason = rejectReason;
     }
 
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
 }

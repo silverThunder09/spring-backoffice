@@ -8,6 +8,7 @@ import com.sparta.cch.backofficeproject.admin.repository.AdminRepository;
 import com.sparta.cch.backofficeproject.common.config.PasswordEncoder;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -318,10 +319,49 @@ public class AdminService {
         Admin admin = findAdminById(adminId);
         adminRepository.delete(admin);
 
+        AdminDeleteResponse data = AdminDeleteResponse.of(adminId);
+
         return AdminApiResponse.success(
                 200,
                 "관리자 삭제에 성공했습니다.",
-                AdminDeleteResponse.of(adminId)
+                data
+        );
+    }
+
+    /**
+     * 로그인한 관리자의 비밀번호를 변경합니다.
+     * 비밀번호 변경 후 세션을 무효화합니다.
+     *
+     * @param sessionAdminId 현재 로그인한 관리자 ID
+     * @param request 현재 비밀번호, 새 비밀번호, 새 비밀번호 확인
+     * @param session 현재 HTTP 세션
+     * @return 비밀번호 변경 결과 응답
+     * @throws ApiException 새 비밀번호와 확인이 일치하지 않는 경우 (INVALID_REQUEST)
+     * @throws ApiException 현재 비밀번호가 일치하지 않는 경우 (PASSWORD_MISMATCH)
+     * @throws ApiException 관리자가 존재하지 않는 경우 (ADMIN_NOT_FOUND)
+     */
+    @Transactional
+    public AdminApiResponse<Void> changePassword(Long sessionAdminId, AdminChangePasswordRequest request, HttpSession session) {
+
+        // 새 비밀번호 확인 일치 여부 검증
+        if (!request.getNewPassword().equals(request.getNewPasswordConfirm())) {
+            throw new ApiException(ErrorCode.INVALID_REQUEST, "새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+
+        Admin admin = findAdminById(sessionAdminId);
+
+        // 현재 비밀번호 일치 여부 검증
+        if (!passwordEncoder.matches(request.getCurrentPassword(), admin.getPassword())) {
+            throw new ApiException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        admin.changePassword(passwordEncoder.encode(request.getNewPassword()));
+        session.invalidate();
+
+        return AdminApiResponse.success(
+                200,
+                "비밀번호 변경에 성공했습니다. 다시 로그인해주세요.",
+                null
         );
     }
 
