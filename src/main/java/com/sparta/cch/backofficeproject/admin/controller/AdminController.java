@@ -2,6 +2,7 @@ package com.sparta.cch.backofficeproject.admin.controller;
 
 import com.sparta.cch.backofficeproject.admin.dto.*;
 import com.sparta.cch.backofficeproject.admin.service.AdminService;
+import com.sparta.cch.backofficeproject.common.dto.CommonResponse;
 import com.sparta.cch.backofficeproject.common.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -25,9 +26,17 @@ public class AdminController {
      * @return 회원가입 결과 응답
      */
     @PostMapping("/signup")
-    public ResponseEntity<AdminApiResponse<AdminSignUpResponse>> signUp(@Valid @RequestBody AdminSignUpRequest request) {
-        AdminApiResponse<AdminSignUpResponse> response = adminService.signUp(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<CommonResponse<AdminSignUpResponse>> signUp(@Valid @RequestBody AdminSignUpRequest request) {
+
+        AdminSignUpResponse response = adminService.signUp(request);
+
+        CommonResponse<AdminSignUpResponse> data = CommonResponse.success(
+                HttpStatus.CREATED.value(),
+                "관리자 회원가입 신청이 완료되었습니다. 슈퍼 관리자의 승인을 기다려주세요.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(data);
     }
 
     /**
@@ -38,10 +47,17 @@ public class AdminController {
      * @return 관리자 목록 및 페이징 정보
      */
     @GetMapping
-    public ResponseEntity<AdminApiResponse<AdminListResponse>> getAll(@Valid AdminListRequest request) {
+    public ResponseEntity<CommonResponse<AdminListResponse>> getAll(@Valid AdminListRequest request) {
 
-        AdminApiResponse<AdminListResponse> response = adminService.getAll(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        AdminListResponse response = adminService.getAll(request);
+
+        CommonResponse<AdminListResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 목록 조회에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -52,10 +68,17 @@ public class AdminController {
      * @return 관리자 상세 정보
      */
     @GetMapping("/{adminId}")
-    public ResponseEntity<AdminApiResponse<AdminDetailResponse>> getAdmin(@PathVariable Long adminId) {
+    public ResponseEntity<CommonResponse<AdminDetailResponse>> getAdmin(@PathVariable Long adminId) {
 
-        AdminApiResponse<AdminDetailResponse> response = adminService.getAdmin(adminId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        AdminDetailResponse response = adminService.getAdmin(adminId);
+
+        CommonResponse<AdminDetailResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 상세 조회에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -67,12 +90,19 @@ public class AdminController {
      * @return 수정된 관리자 정보
      */
     @PutMapping("/{adminId}")
-    public ResponseEntity<AdminApiResponse<AdminUpdateResponse>> updateAdmin(
-     @PathVariable Long adminId ,
-     @Valid @RequestBody AdminUpdateRequest request) {
+    public ResponseEntity<CommonResponse<AdminUpdateResponse>> updateAdmin(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminUpdateRequest request) {
 
-        AdminApiResponse<AdminUpdateResponse> response = adminService.updateAdmin(adminId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        AdminUpdateResponse response = adminService.updateAdmin(adminId, request);
+
+        CommonResponse<AdminUpdateResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 정보 수정에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -84,12 +114,19 @@ public class AdminController {
      * @return 변경된 관리자 상태 정보
      */
     @PatchMapping("/{adminId}/status")
-    public ResponseEntity<AdminApiResponse<AdminUpdateStatusResponse>> updateAdminStatus(
-             @PathVariable Long adminId,
-             @Valid @RequestBody AdminUpdateStatusRequest request) {
+    public ResponseEntity<CommonResponse<AdminUpdateStatusResponse>> updateAdminStatus(
+            @PathVariable Long adminId,
+            @Valid @RequestBody AdminUpdateStatusRequest request) {
 
-        AdminApiResponse<AdminUpdateStatusResponse> response = adminService.updateAdminStatus(adminId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        AdminUpdateStatusResponse response = adminService.updateAdminStatus(adminId, request);
+
+        CommonResponse<AdminUpdateStatusResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 상태 변경에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -101,14 +138,20 @@ public class AdminController {
      * @return 변경된 관리자 역할 정보
      */
     @PatchMapping("/{adminId}/role")
-    public ResponseEntity<AdminApiResponse<AdminUpdateRoleResponse>> updateAdminRole(
+    public ResponseEntity<CommonResponse<AdminUpdateRoleResponse>> updateAdminRole(
             @PathVariable Long adminId,
             @Valid @RequestBody AdminUpdateRoleRequest request) {
 
-        AdminApiResponse<AdminUpdateRoleResponse> response = adminService.updateAdminRole(adminId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+        AdminUpdateRoleResponse response = adminService.updateAdminRole(adminId, request);
 
+        CommonResponse<AdminUpdateRoleResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 역할 변경에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
+    }
 
     /**
      * 신규 관리자의 가입 신청을 승인합니다.
@@ -119,10 +162,17 @@ public class AdminController {
      * @return 승인된 관리자 정보
      */
     @PostMapping("/{adminId}/approve")
-    public ResponseEntity<AdminApiResponse<AdminApproveResponse>> approveAdmin(@PathVariable Long adminId) {
+    public ResponseEntity<CommonResponse<AdminApproveResponse>> approveAdmin(@PathVariable Long adminId) {
 
-        AdminApiResponse<AdminApproveResponse> response = adminService.approveAdmin(adminId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        AdminApproveResponse response = adminService.approveAdmin(adminId);
+
+        CommonResponse<AdminApproveResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 승인 처리에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -135,29 +185,43 @@ public class AdminController {
      * @return 거부된 관리자 정보
      */
     @PostMapping("/{adminId}/reject")
-    public ResponseEntity<AdminApiResponse<AdminRejectResponse>> rejectAdmin(
+    public ResponseEntity<CommonResponse<AdminRejectResponse>> rejectAdmin(
             @PathVariable Long adminId,
             @Valid @RequestBody AdminRejectRequest request) {
 
-        AdminApiResponse<AdminRejectResponse> response = adminService.rejectAdmin(adminId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        AdminRejectResponse response = adminService.rejectAdmin(adminId, request);
+
+        CommonResponse<AdminRejectResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 거부 처리에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
      * 특정 관리자를 삭제합니다.
      * 슈퍼 관리자만 접근할 수 있습니다.
      *
-     * @param adminId 삭제할 관리자 ID
+     * @param adminId        삭제할 관리자 ID
      * @param sessionAdminId 현재 로그인한 슈퍼 관리자 ID
      * @return 삭제된 관리자 ID
      */
     @DeleteMapping("/{adminId}")
-    public ResponseEntity<AdminApiResponse<AdminDeleteResponse>> deleteAdmin(
+    public ResponseEntity<CommonResponse<AdminDeleteResponse>> deleteAdmin(
             @PathVariable Long adminId,
             @SessionAttribute(SessionConst.ADMIN_ID) Long sessionAdminId) {
 
-        AdminApiResponse<AdminDeleteResponse> response = adminService.deleteAdmin(adminId, sessionAdminId);
-        return ResponseEntity.ok(response);
+        AdminDeleteResponse response = adminService.deleteAdmin(adminId, sessionAdminId);
+
+        CommonResponse<AdminDeleteResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "관리자 삭제에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.ok(data);
     }
 
     /**
@@ -165,18 +229,25 @@ public class AdminController {
      * 비밀번호 변경 후 세션이 무효화됩니다.
      *
      * @param sessionAdminId 현재 로그인한 관리자 ID
-     * @param request 현재 비밀번호, 새 비밀번호, 새 비밀번호 확인
-     * @param session 현재 HTTP 세션
+     * @param request        현재 비밀번호, 새 비밀번호, 새 비밀번호 확인
+     * @param session        현재 HTTP 세션
      * @return 비밀번호 변경 결과 응답
      */
     @PatchMapping("/password")
-    public ResponseEntity<AdminApiResponse<Void>> changePassword(
+    public ResponseEntity<CommonResponse<Void>> changePassword(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long sessionAdminId,
             @Valid @RequestBody AdminChangePasswordRequest request,
             HttpSession session) {
 
-        AdminApiResponse<Void> response = adminService.changePassword(sessionAdminId, request, session);
-        return ResponseEntity.ok(response);
+        adminService.changePassword(sessionAdminId, request, session);
+
+        CommonResponse<Void> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "비밀번호 변경에 성공했습니다. 다시 로그인해주세요.",
+                null
+        );
+
+        return ResponseEntity.ok(data);
     }
 
     /**
@@ -186,27 +257,41 @@ public class AdminController {
      * @return 내 프로필 조회 결과 응답
      */
     @GetMapping("/me")
-    public ResponseEntity<AdminApiResponse<AdminMyProfileResponse>> getMyProfile(
+    public ResponseEntity<CommonResponse<AdminMyProfileResponse>> getMyProfile(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long sessionAdminId) {
 
-        AdminApiResponse<AdminMyProfileResponse> response = adminService.getMyProfile(sessionAdminId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        AdminMyProfileResponse response = adminService.getMyProfile(sessionAdminId);
+
+        CommonResponse<AdminMyProfileResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "내 프로필 조회에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
      * 로그인한 관리자의 내 프로필 정보를 수정합니다.
      *
      * @param sessionAdminId 현재 로그인한 관리자 ID
-     * @param request 수정할 이름, 이메일, 전화번호
+     * @param request        수정할 이름, 이메일, 전화번호
      * @return 내 프로필 수정 결과 응답
      */
     @PutMapping("/me")
-    public ResponseEntity<AdminApiResponse<AdminMyProfileUpdateResponse>> updateMyProfile(
+    public ResponseEntity<CommonResponse<AdminMyProfileUpdateResponse>> updateMyProfile(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long sessionAdminId,
             @Valid @RequestBody AdminMyProfileUpdateRequest request
     ) {
-        AdminApiResponse<AdminMyProfileUpdateResponse> response = adminService.updateMyProfile(sessionAdminId, request);
+        AdminMyProfileUpdateResponse response = adminService.updateMyProfile(sessionAdminId, request);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        CommonResponse<AdminMyProfileUpdateResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "내 프로필 수정에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 }
+
