@@ -49,6 +49,7 @@ public enum ErrorCode {
     INVALID_PRODUCT_ID(HttpStatus.BAD_REQUEST, "INVALID_PRODUCT_ID", "상품 ID는 1 이상이어야 합니다."),
     INVALID_ORDER_ID(HttpStatus.BAD_REQUEST, "INVALID_ORDER_ID", "주문 ID는 1 이상이어야 합니다."),
 
+
     // 조회 대상 없음
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "ADMIN_NOT_FOUND", "존재하지 않는 관리자입니다."),
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "존재하지 않는 고객입니다."),
