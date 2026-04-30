@@ -97,17 +97,7 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return OrderCreateResponseDto.builder()
-                .orderId(savedOrder.getId())
-                .orderNo(savedOrder.getOrderNo())
-                .customerId(savedOrder.getCustomer().getId())
-                .productId(savedOrder.getProduct().getId())
-                .quantity(savedOrder.getQuantity())
-                .orderPrice(savedOrder.getOrderPrice())
-                .totalPrice(savedOrder.getTotalPrice())
-                .status(savedOrder.getStatus())
-                .orderedAt(savedOrder.getOrderedAt())
-                .build();
+        return OrderCreateResponseDto.of(savedOrder);
     }
 
     /**
@@ -177,30 +167,12 @@ public class OrderService {
         );
 
         List<OrderListItemResponseDto> orders = orderPage.getContent().stream()
-                .map(order -> OrderListItemResponseDto.builder()
-                        .id(order.getId())
-                        .orderNo(order.getOrderNo())
-                        .customerName(order.getCustomer().getName())
-                        .productName(order.getProduct().getName())
-                        .quantity(order.getQuantity())
-                        .totalPrice(order.getTotalPrice())
-                        .status(order.getStatus())
-                        .orderedAt(order.getOrderedAt())
-                        .adminName(order.getAdmin() != null ? order.getAdmin().getName() : null)
-                        .build())
+                .map(OrderListItemResponseDto::of)
                 .toList();
 
-        OrderPageInfoResponseDto pageInfo = OrderPageInfoResponseDto.builder()
-                .currentPage(requestDto.getPage())
-                .pageSize(requestDto.getSize())
-                .totalElements(orderPage.getTotalElements())
-                .totalPages(orderPage.getTotalPages())
-                .build();
+        OrderPageInfoResponseDto pageInfo = OrderPageInfoResponseDto.of(orderPage, requestDto.getPage());
 
-        return OrderListResponseDto.builder()
-                .orders(orders)
-                .pageInfo(pageInfo)
-                .build();
+        return OrderListResponseDto.of(orders, pageInfo);
     }
 
     /**
@@ -225,22 +197,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ApiException(ErrorCode.ORDER_NOT_FOUND));
 
-        return OrderDetailResponseDto.builder()
-                .id(order.getId())
-                .orderNo(order.getOrderNo())
-                .customerId(order.getCustomer().getId())
-                .customerName(order.getCustomer().getName())
-                .customerEmail(order.getCustomer().getEmail())
-                .productId(order.getProduct().getId())
-                .productName(order.getProduct().getName())
-                .quantity(order.getQuantity())
-                .totalPrice(order.getTotalPrice())
-                .status(order.getStatus())
-                .orderedAt(order.getOrderedAt())
-                .adminId(order.getAdmin() != null ? order.getAdmin().getId() : null)
-                .adminName(order.getAdmin() != null ? order.getAdmin().getName() : null)
-                .cancelReason(order.getCancelReason())
-                .build();
+        return OrderDetailResponseDto.of(order);
     }
 
     /**
@@ -300,13 +257,7 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return OrderStatusUpdateResponseDto.builder()
-                .id(savedOrder.getId())
-                .orderNo(savedOrder.getOrderNo())
-                .previousStatus(previousStatus)
-                .currentStatus(savedOrder.getStatus())
-                .updatedAt(savedOrder.getUpdatedAt())
-                .build();
+        return OrderStatusUpdateResponseDto.of(savedOrder, previousStatus);
     }
 
     /**
@@ -358,14 +309,7 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        return OrderCancelResponseDto.builder()
-                .id(savedOrder.getId())
-                .orderNo(savedOrder.getOrderNo())
-                .previousStatus(previousStatus)
-                .currentStatus(savedOrder.getStatus())
-                .cancelReason(savedOrder.getCancelReason())
-                .updatedAt(savedOrder.getUpdatedAt())
-                .build();
+        return OrderCancelResponseDto.of(savedOrder, previousStatus);
     }
 
     /**

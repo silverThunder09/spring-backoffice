@@ -1,5 +1,6 @@
 package com.sparta.cch.backofficeproject.order.dto;
 
+import com.sparta.cch.backofficeproject.order.entity.Order;
 import com.sparta.cch.backofficeproject.order.entity.OrderStatus;
 import lombok.Builder;
 import lombok.Getter;
@@ -85,4 +86,29 @@ public class OrderDetailResponseDto {
      * 취소 주문만 값이 존재할 수 있음
      */
     private final String cancelReason;
+
+    /**
+     * Order 엔티티를 주문 상세 조회 응답 DTO로 변환합니다.
+     *
+     * @param order 조회한 주문 엔티티
+     * @return 주문 상세 조회 응답 DTO
+     */
+    public static OrderDetailResponseDto of(Order order) {
+        return OrderDetailResponseDto.builder()
+                .id(order.getId())
+                .orderNo(order.getOrderNo())
+                .customerId(order.getCustomer().getId())
+                .customerName(order.getCustomer().getName())
+                .customerEmail(order.getCustomer().getEmail())
+                .productId(order.getProduct().getId())
+                .productName(order.getProduct().getName())
+                .quantity(order.getQuantity())
+                .totalPrice(order.getTotalPrice())
+                .status(order.getStatus())
+                .orderedAt(order.getOrderedAt())
+                .adminId(order.getAdmin() != null ? order.getAdmin().getId() : null)
+                .adminName(order.getAdmin() != null ? order.getAdmin().getName() : null)
+                .cancelReason(order.getCancelReason())
+                .build();
+    }
 }
