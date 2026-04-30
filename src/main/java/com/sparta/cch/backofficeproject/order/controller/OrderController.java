@@ -1,5 +1,6 @@
 package com.sparta.cch.backofficeproject.order.controller;
 
+import com.sparta.cch.backofficeproject.common.dto.CommonResponse;
 import com.sparta.cch.backofficeproject.common.session.SessionConst;
 import com.sparta.cch.backofficeproject.order.dto.*;
 import com.sparta.cch.backofficeproject.order.service.OrderService;
@@ -23,13 +24,13 @@ public class OrderController {
      * 주문 생성 API
      */
     @PostMapping
-    public ResponseEntity<OrderApiResponse<OrderCreateResponseDto>> createOrder(
+    public ResponseEntity<CommonResponse<OrderCreateResponseDto>> createOrder(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
             @Valid @RequestBody OrderCreateRequestDto requestDto
     ) {
         OrderCreateResponseDto responseDto = orderService.createOrder(requestDto, adminId);
 
-        OrderApiResponse<OrderCreateResponseDto> response = OrderApiResponse.success(
+        CommonResponse<OrderCreateResponseDto> response = CommonResponse.success(
                 HttpStatus.CREATED.value(),
                 "주문 생성 성공",
                 responseDto
@@ -50,13 +51,13 @@ public class OrderController {
      * @return 주문 목록 조회 결과 응답
      */
     @GetMapping
-    public ResponseEntity<OrderApiResponse<OrderListResponseDto>> getOrders(
+    public ResponseEntity<CommonResponse<OrderListResponseDto>> getOrders(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
-            @ModelAttribute OrderListSearchRequestDto requestDto // 쿼리 파라미터를 받는 API
+            @Valid @ModelAttribute OrderListSearchRequestDto requestDto // 쿼리 파라미터를 받는 API
     ) {
         OrderListResponseDto responseDto = orderService.getOrders(adminId, requestDto);
 
-        OrderApiResponse<OrderListResponseDto> response = OrderApiResponse.success(
+        CommonResponse<OrderListResponseDto> response = CommonResponse.success(
                 HttpStatus.OK.value(),
                 "주문 목록 조회 성공",
                 responseDto
@@ -75,13 +76,13 @@ public class OrderController {
      * @return 주문 상세 조회 결과 응답
      */
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderApiResponse<OrderDetailResponseDto>> getOrder(
+    public ResponseEntity<CommonResponse<OrderDetailResponseDto>> getOrder(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
             @PathVariable Long orderId
     ) {
         OrderDetailResponseDto responseDto = orderService.getOrder(adminId, orderId);
 
-        OrderApiResponse<OrderDetailResponseDto> response = OrderApiResponse.success(
+        CommonResponse<OrderDetailResponseDto> response = CommonResponse.success(
                 HttpStatus.OK.value(),
                 "주문 상세 조회 성공",
                 responseDto
@@ -101,7 +102,7 @@ public class OrderController {
      * @return 주문 상태 변경 결과 응답
      */
     @PatchMapping("/{orderId}/status")
-    public ResponseEntity<OrderApiResponse<OrderStatusUpdateResponseDto>> updateOrderStatus(
+    public ResponseEntity<CommonResponse<OrderStatusUpdateResponseDto>> updateOrderStatus(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
             @PathVariable Long orderId,
             @Valid @RequestBody OrderStatusUpdateRequestDto requestDto
@@ -109,7 +110,7 @@ public class OrderController {
         OrderStatusUpdateResponseDto responseDto =
                 orderService.updateOrderStatus(adminId, orderId, requestDto);
 
-        OrderApiResponse<OrderStatusUpdateResponseDto> response = OrderApiResponse.success(
+        CommonResponse<OrderStatusUpdateResponseDto> response = CommonResponse.success(
                 HttpStatus.OK.value(),
                 "주문 상태 변경 성공",
                 responseDto
@@ -129,7 +130,7 @@ public class OrderController {
      * @return 주문 취소 결과 응답
      */
     @PatchMapping("/{orderId}/cancel")
-    public ResponseEntity<OrderApiResponse<OrderCancelResponseDto>> cancelOrder(
+    public ResponseEntity<CommonResponse<OrderCancelResponseDto>> cancelOrder(
             @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
             @PathVariable Long orderId,
             @Valid @RequestBody OrderCancelRequestDto requestDto
@@ -138,7 +139,7 @@ public class OrderController {
         OrderCancelResponseDto responseDto
                 = orderService.cancelOrder(adminId, orderId, requestDto);
 
-        OrderApiResponse<OrderCancelResponseDto> response = OrderApiResponse.success(
+        CommonResponse<OrderCancelResponseDto> response = CommonResponse.success(
                 HttpStatus.OK.value(),
                 "주문 취소 성공",
                 responseDto
