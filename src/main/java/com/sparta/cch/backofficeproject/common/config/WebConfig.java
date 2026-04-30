@@ -23,10 +23,19 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(superAdminCheckInterceptor)
                 .addPathPatterns(
                         "/api/admins",
+                        "/api/admins/*",
                         "/api/admins/*/role",
                         "/api/admins/*/status",
                         "/api/admins/*/approve",
                         "/api/admins/*/reject"
+                )
+                .excludePathPatterns(
+                        "/api/admins/signup",
+                        "/api/admins/login",
+                        "/api/admins/logout",
+                        "/api/admins/password",
+                        "/api/admins/customers/**",
+                        "/api/admins/me"
                 );
     }
 }

@@ -1,8 +1,9 @@
 package com.sparta.cch.backofficeproject.admin.controller;
 
+
+import com.sparta.cch.backofficeproject.admin.dto.AdminSignUpRequest;
 import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import com.sparta.cch.backofficeproject.admin.entity.AdminRole;
-import com.sparta.cch.backofficeproject.admin.entity.AdminStatus;
 import com.sparta.cch.backofficeproject.admin.repository.AdminRepository;
 import com.sparta.cch.backofficeproject.common.config.PasswordEncoder;
 import com.sparta.cch.backofficeproject.common.session.SessionConst;
@@ -10,18 +11,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 @Transactional
 class AdminAuthIntegrationTest {
 
@@ -34,6 +33,9 @@ class AdminAuthIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     @DisplayName("관리자 회원가입 성공")
     void signUpSuccess() throws Exception {
@@ -42,7 +44,7 @@ class AdminAuthIntegrationTest {
                   "name": "관리자",
                   "email": "cs01@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-1234-5678",
+                  "phone": "010-1234-5678",
                   "role": "cs"
                 }
                 """;
@@ -63,15 +65,12 @@ class AdminAuthIntegrationTest {
     @Test
     @DisplayName("중복 이메일로 회원가입하면 실패")
     void signUpFailWhenEmailDuplicated() throws Exception {
-        adminRepository.save(
-                Admin.signUp(
-                        "기존관리자",
-                        "duplicated@admin.com",
-                        "010-1111-1111",
-                        passwordEncoder.encode("12345678"),
-                        AdminStatus.PENDING,
-                        AdminRole.CS
-                )
+        savePendingAdmin(
+                "기존관리자",
+                "duplicated@admin.com",
+                "12345678",
+                "010-1111-1111",
+                "OPERATION"
         );
 
         String requestBody = """
@@ -79,7 +78,7 @@ class AdminAuthIntegrationTest {
                   "name": "관리자",
                   "email": "duplicated@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-1234-5678",
+                  "phone": "010-1234-5678",
                   "role": "CS"
                 }
                 """;
@@ -101,7 +100,7 @@ class AdminAuthIntegrationTest {
                   "name": "관리자",
                   "email": "super-test@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-1234-5678",
+                  "phone": "010-1234-5678",
                   "role": "SUPER"
                 }
                 """;
@@ -123,7 +122,7 @@ class AdminAuthIntegrationTest {
                   "name": "운영관리자",
                   "email": "operation01@admin.com",
                   "password": "12345678",
-                  "phoneNumber": "010-2222-3333",
+                  "phone": "010-2222-3333",
                   "role": "operation"
                 }
                 """;
@@ -139,15 +138,12 @@ class AdminAuthIntegrationTest {
     @Test
     @DisplayName("관리자 로그인 성공 시 세션에 관리자 정보 저장")
     void loginSuccess() throws Exception {
-        Admin activeAdmin = adminRepository.save(
-                new Admin(
-                        "활성관리자",
-                        "active@admin.com",
-                        "010-5555-5555",
-                        passwordEncoder.encode("12345678"),
-                        AdminStatus.ACTIVE,
-                        AdminRole.CS
-                )
+        Admin activeAdmin = saveActiveAdmin(
+                "활성관리자",
+                "active@admin.com",
+                "12345678",
+                "010-5555-5555",
+                "CS"
         );
 
         String requestBody = """
@@ -175,15 +171,12 @@ class AdminAuthIntegrationTest {
     @Test
     @DisplayName("승인 대기 관리자는 로그인할 수 없다")
     void loginFailWhenStatusIsPending() throws Exception {
-        adminRepository.save(
-                new Admin(
-                        "대기관리자",
-                        "pending@admin.com",
-                        "010-6666-6666",
-                        passwordEncoder.encode("12345678"),
-                        AdminStatus.PENDING,
-                        AdminRole.CS
-                )
+        savePendingAdmin(
+                "대기관리자",
+                "pending@admin.com",
+                "12345678",
+                "010-6666-6666",
+                "CS"
         );
 
         String requestBody = """
@@ -200,5 +193,52 @@ class AdminAuthIntegrationTest {
                 .andExpect(jsonPath("$.status").value(403))
                 .andExpect(jsonPath("$.message").value("슈퍼 관리자의 승인을 기다리고 있습니다. 승인 후 로그인 부탁드립니다."))
                 .andExpect(jsonPath("$.errorCode").value("ADMIN_PENDING"));
+    }
+
+    private Admin savePendingAdmin(
+            String name,
+            String email,
+            String rawPassword,
+            String phone,
+            String roleValue
+    ) throws Exception {
+        AdminSignUpRequest request = createSignUpRequest(name, email, rawPassword, phone, roleValue);
+        AdminRole role = AdminRole.from(request.getRole());
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        Admin admin = Admin.signUp(request, role, encodedPassword);
+        return adminRepository.save(admin);
+    }
+
+    private Admin saveActiveAdmin(
+            String name,
+            String email,
+            String rawPassword,
+            String phone,
+            String roleValue
+    ) throws Exception {
+        Admin admin = savePendingAdmin(name, email, rawPassword, phone, roleValue);
+        admin.approve();
+        return admin;
+    }
+
+    private AdminSignUpRequest createSignUpRequest(
+            String name,
+            String email,
+            String password,
+            String phone,
+            String role
+    ) throws Exception {
+        String requestBody = """
+                {
+                  "name": "%s",
+                  "email": "%s",
+                  "password": "%s",
+                  "phone": "%s",
+                  "role": "%s"
+                }
+                """.formatted(name, email, password, phone, role);
+
+        return objectMapper.readValue(requestBody, AdminSignUpRequest.class);
     }
 }

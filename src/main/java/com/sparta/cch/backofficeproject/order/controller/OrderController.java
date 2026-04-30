@@ -1,13 +1,150 @@
 package com.sparta.cch.backofficeproject.order.controller;
 
+import com.sparta.cch.backofficeproject.common.dto.CommonResponse;
+import com.sparta.cch.backofficeproject.common.session.SessionConst;
+import com.sparta.cch.backofficeproject.order.dto.*;
+import com.sparta.cch.backofficeproject.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+/**
+ * 주문 관련 요청을 처리하는 컨트롤러 클래스
+ */
 @RestController
 @RequiredArgsConstructor
-
+@RequestMapping("/api/orders")
 public class OrderController {
 
+    private final OrderService orderService;
 
+    /**
+     * 주문 생성 API
+     */
+    @PostMapping
+    public ResponseEntity<CommonResponse<OrderCreateResponseDto>> createOrder(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @Valid @RequestBody OrderCreateRequestDto requestDto
+    ) {
+        OrderCreateResponseDto responseDto = orderService.createOrder(requestDto, adminId);
 
+        CommonResponse<OrderCreateResponseDto> response = CommonResponse.success(
+                HttpStatus.CREATED.value(),
+                "주문 생성 성공",
+                responseDto
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * 주문 목록 조회 API
+     * <p>
+     * 로그인한 관리자가 주문 목록을 조회합니다.
+     * 주문번호 또는 고객명으로 검색할 수 있고,
+     * 주문 상태 필터, 페이지네이션, 정렬 조건을 함께 받을 수 있습니다.
+     *
+     * @param adminId    세션에 저장된 로그인 관리자 ID
+     * @param requestDto 주문 목록 조회 조건 DTO
+     * @return 주문 목록 조회 결과 응답
+     */
+    @GetMapping
+    public ResponseEntity<CommonResponse<OrderListResponseDto>> getOrders(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @Valid @ModelAttribute OrderListSearchRequestDto requestDto // 쿼리 파라미터를 받는 API
+    ) {
+        OrderListResponseDto responseDto = orderService.getOrders(adminId, requestDto);
+
+        CommonResponse<OrderListResponseDto> response = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "주문 목록 조회 성공",
+                responseDto
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 주문 상세 조회 API
+     * <p>
+     * 로그인한 관리자가 특정 주문의 상세 정보를 조회합니다.
+     *
+     * @param adminId 세션에 저장된 로그인 관리자 ID
+     * @param orderId 조회할 주문 ID
+     * @return 주문 상세 조회 결과 응답
+     */
+    @GetMapping("/{orderId}")
+    public ResponseEntity<CommonResponse<OrderDetailResponseDto>> getOrder(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @PathVariable Long orderId
+    ) {
+        OrderDetailResponseDto responseDto = orderService.getOrder(adminId, orderId);
+
+        CommonResponse<OrderDetailResponseDto> response = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "주문 상세 조회 성공",
+                responseDto
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 주문 상태 변경 API
+     * <p>
+     * 로그인한 관리자가 특정 주문의 상태를 변경합니다.
+     *
+     * @param adminId    세션에 저장된 로그인 관리자 ID
+     * @param orderId    상태를 변경할 주문 ID
+     * @param requestDto 주문 상태 변경 요청 DTO
+     * @return 주문 상태 변경 결과 응답
+     */
+    @PatchMapping("/{orderId}/status")
+    public ResponseEntity<CommonResponse<OrderStatusUpdateResponseDto>> updateOrderStatus(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderStatusUpdateRequestDto requestDto
+    ) {
+        OrderStatusUpdateResponseDto responseDto =
+                orderService.updateOrderStatus(adminId, orderId, requestDto);
+
+        CommonResponse<OrderStatusUpdateResponseDto> response = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "주문 상태 변경 성공",
+                responseDto
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 주문 취소 API
+     * <p>
+     * 로그인한 관리자가 특정 주문을 취소합니다.
+     *
+     * @param adminId    세션에 저장된 로그인 관리자 ID
+     * @param orderId    취소할 주문 ID
+     * @param requestDto 주문 취소 요청 DTO
+     * @return 주문 취소 결과 응답
+     */
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<CommonResponse<OrderCancelResponseDto>> cancelOrder(
+            @SessionAttribute(name = SessionConst.ADMIN_ID) Long adminId,
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderCancelRequestDto requestDto
+    ) {
+
+        OrderCancelResponseDto responseDto
+                = orderService.cancelOrder(adminId, orderId, requestDto);
+
+        CommonResponse<OrderCancelResponseDto> response = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "주문 취소 성공",
+                responseDto
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }
