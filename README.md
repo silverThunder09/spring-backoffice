@@ -3,6 +3,17 @@
 > 이커머스 서비스 운영을 위한 **백오피스 관리자 시스템**입니다.  
 > 관리자 계정, 고객, 상품, 주문 정보를 관리하고, 주문 생성/취소에 따른 재고 반영과 주문 상태 흐름 검증을 처리합니다.
 
+## Our Team
+
+| 이름 | GitHub / 연락처 | 역할 |
+|---|---|---|
+| 성채원 | [@Schaewon2](https://github.com/Schaewon2) | TL / BE |
+| 전은기 | [@silverThunder09](https://github.com/silverThunder09) | BE |
+| 임선구 | [@IMSUN9](https://github.com/IMSUN9) | BE |
+
+## 프로젝트 노션 바로가기
+[프로젝트 팀 노션 바로가기](https://www.notion.so/teamsparta/3-3432dc3ef51480fe831bed6446644128?source=copy_link)
+
 <br>
 
 ## 1. 프로젝트 소개
