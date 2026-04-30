@@ -6,12 +6,21 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
 public class ProductDeleteResponse {
 
     private final String message;
     private final Long deleteId;
     private final LocalDateTime deletedAt;
+
+    @Builder
+    public ProductDeleteResponse(
+            String message,
+            Long deleteId,
+            LocalDateTime deletedAt) {
+        this.message = message;
+        this.deleteId = deleteId;
+        this.deletedAt = deletedAt;
+    }
 
     public static ProductDeleteResponse of(Long id) {
         return ProductDeleteResponse.builder()

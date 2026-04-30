@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
  * 클라이언트에게 반환할 상품 데이터를 담습니다.
  */
 @Getter
-@Builder
 @JsonPropertyOrder({"id", "name", "category", "price", "stock", "status", "description", "createdAt", "adminName", "adminEmail"})
 public class ProductGetDetailResponse {
 
@@ -28,6 +27,30 @@ public class ProductGetDetailResponse {
     private final LocalDateTime createdAt;
     private final String adminName;
     private final String adminEmail;
+
+    @Builder
+    public ProductGetDetailResponse(
+            Long id,
+            String name,
+            ProductCategory category,
+            Integer price,
+            Integer stock,
+            ProductStatus status,
+            String description,
+            LocalDateTime createdAt,
+            String adminName,
+            String adminEmail) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.stock = stock;
+        this.status = status;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.adminName = adminName;
+        this.adminEmail = adminEmail;
+    }
 
     public static ProductGetDetailResponse of(Product product) {
         // Admin이 null일 경우 NullPointerException을 방지하기 위해, 검증합니다.

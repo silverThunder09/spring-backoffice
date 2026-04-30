@@ -9,7 +9,6 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
 public class ProductSimpleResponse {
     private final Long id;
     private final String name;
@@ -19,6 +18,26 @@ public class ProductSimpleResponse {
     private final ProductStatus status;
     private final LocalDateTime createdAt;
     private final String adminName;
+
+    @Builder
+    public ProductSimpleResponse(
+            Long id,
+            String name,
+            ProductCategory category,
+            Integer price,
+            Integer stock,
+            ProductStatus status,
+            LocalDateTime createdAt,
+            String adminName) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.stock = stock;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.adminName = adminName;
+    }
 
     public static ProductSimpleResponse of(Product product) {
         return ProductSimpleResponse.builder()

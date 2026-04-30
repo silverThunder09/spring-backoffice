@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
  * 클라이언트에게 반환할 상품 데이터를 담습니다.
  */
 @Getter
-@Builder
 public class ProductCreateResponse {
 
     private final Long id;
@@ -26,6 +25,31 @@ public class ProductCreateResponse {
     private final String description;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+
+    @Builder
+    public ProductCreateResponse(
+            Long id,
+            Long adminId,
+            String name,
+            ProductCategory category,
+            Integer price,
+            Integer stock,
+            ProductStatus status,
+            String description,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
+
+        this.id = id;
+        this.adminId = adminId;
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.stock = stock;
+        this.status = status;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
     /**
      * 엔티티 객체를 응답 DTO로 변환합니다.
