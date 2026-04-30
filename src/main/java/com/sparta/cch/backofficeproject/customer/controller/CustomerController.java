@@ -1,6 +1,6 @@
 package com.sparta.cch.backofficeproject.customer.controller;
 
-import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
+import com.sparta.cch.backofficeproject.common.dto.CommonResponse;
 import com.sparta.cch.backofficeproject.customer.dto.*;
 import com.sparta.cch.backofficeproject.customer.service.CustomerService;
 import jakarta.validation.Valid;
@@ -24,11 +24,18 @@ public class CustomerController {
      * @return 고객 목록 조회 결과 응답
      */
     @GetMapping
-    public ResponseEntity<AdminApiResponse<CustomerListResponse>> getAll(
+    public ResponseEntity<CommonResponse<CustomerListResponse>> getAll(
             @Valid CustomerListRequest request
     ) {
-        AdminApiResponse<CustomerListResponse> response = customerService.getAll(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        CustomerListResponse response = customerService.getAll(request);
+
+        CommonResponse<CustomerListResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "고객 목록 조회에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -38,11 +45,18 @@ public class CustomerController {
      * @return 고객 상세 조회 결과 응답
      */
     @GetMapping("/{customerId}")
-    public ResponseEntity<AdminApiResponse<CustomerDetailResponse>> getCustomer(
+    public ResponseEntity<CommonResponse<CustomerDetailResponse>> getCustomer(
             @PathVariable Long customerId
     ) {
-        AdminApiResponse<CustomerDetailResponse> response = customerService.getCustomer(customerId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        CustomerDetailResponse response = customerService.getCustomer(customerId);
+
+        CommonResponse<CustomerDetailResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "고객 상세 조회에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -53,12 +67,19 @@ public class CustomerController {
      * @return 고객 정보 수정 결과 응답
      */
     @PatchMapping("/{customerId}")
-    public ResponseEntity<AdminApiResponse<CustomerUpdateResponse>> updateCustomer(
+    public ResponseEntity<CommonResponse<CustomerUpdateResponse>> updateCustomer(
             @PathVariable Long customerId,
             @Valid @RequestBody CustomerUpdateRequest request
     ) {
-        AdminApiResponse<CustomerUpdateResponse> response = customerService.updateCustomer(customerId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        CustomerUpdateResponse response = customerService.updateCustomer(customerId, request);
+
+        CommonResponse<CustomerUpdateResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "고객 정보 수정에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
 
     /**
@@ -69,14 +90,19 @@ public class CustomerController {
      * @return 고객 상태 변경 결과 응답
      */
     @PatchMapping("/{customerId}/status")
-    public ResponseEntity<AdminApiResponse<CustomerStatusUpdateResponse>> updateCustomerStatus(
+    public ResponseEntity<CommonResponse<CustomerStatusUpdateResponse>> updateCustomerStatus(
             @PathVariable Long customerId,
             @Valid @RequestBody CustomerStatusUpdateRequest request
     ) {
-        AdminApiResponse<CustomerStatusUpdateResponse> response = customerService.updateCustomerStatus(customerId, request);
+        CustomerStatusUpdateResponse response =
+                customerService.updateCustomerStatus(customerId, request);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        CommonResponse<CustomerStatusUpdateResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "고객 상태 변경에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
     }
-
 }
-

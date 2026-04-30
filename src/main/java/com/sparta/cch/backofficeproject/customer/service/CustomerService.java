@@ -1,14 +1,11 @@
 package com.sparta.cch.backofficeproject.customer.service;
 
-import com.sparta.cch.backofficeproject.admin.dto.AdminApiResponse;
-import com.sparta.cch.backofficeproject.admin.entity.Admin;
 import com.sparta.cch.backofficeproject.common.exception.ApiException;
 import com.sparta.cch.backofficeproject.common.exception.ErrorCode;
 import com.sparta.cch.backofficeproject.customer.dto.*;
 import com.sparta.cch.backofficeproject.customer.entity.Customer;
 import com.sparta.cch.backofficeproject.customer.entity.CustomerStatus;
 import com.sparta.cch.backofficeproject.customer.repository.CustomerRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,7 +32,7 @@ public class CustomerService {
      * @return 고객 목록 및 페이징 정보
      */
     @Transactional(readOnly = true)
-    public AdminApiResponse<CustomerListResponse> getAll(CustomerListRequest request) {
+    public CustomerListResponse getAll(CustomerListRequest request) {
 
         Pageable pageable = PageRequest.of(
                 request.getPage() - 1,
@@ -53,13 +50,7 @@ public class CustomerService {
                 pageable
         );
 
-        CustomerListResponse data = CustomerListResponse.of(customerPage);
-
-        return AdminApiResponse.success(
-                200,
-                "고객 목록 조회에 성공했습니다.",
-                data
-        );
+        return CustomerListResponse.of(customerPage);
     }
 
     /**
@@ -72,19 +63,12 @@ public class CustomerService {
      * @return 고객 상세 조회 결과 응답
      */
     @Transactional(readOnly = true)
-    public AdminApiResponse<CustomerDetailResponse> getCustomer(Long customerId) {
+    public CustomerDetailResponse getCustomer(Long customerId) {
 
         Customer customer = findCustomerById(customerId);
 
-        CustomerDetailResponse data = CustomerDetailResponse.of(customer);
-
-        return AdminApiResponse.success(
-                200,
-                "고객 상세 조회에 성공했습니다.",
-                data
-        );
+        return CustomerDetailResponse.of(customer);
     }
-
 
     /**
      * 고객 ID로 고객을 조회합니다.
@@ -114,7 +98,7 @@ public class CustomerService {
      * @return 고객 정보 수정 결과 응답
      */
     @Transactional
-    public AdminApiResponse<CustomerUpdateResponse> updateCustomer(Long customerId, CustomerUpdateRequest request) {
+    public CustomerUpdateResponse updateCustomer(Long customerId, CustomerUpdateRequest request) {
 
         Customer customer = findCustomerById(customerId);
 
@@ -126,13 +110,7 @@ public class CustomerService {
 
         customer.update(request.getName(), request.getEmail(), request.getPhone());
 
-        CustomerUpdateResponse data = CustomerUpdateResponse.of(customer);
-
-        return AdminApiResponse.success(
-                200,
-                "고객 정보 수정에 성공했습니다.",
-                data
-        );
+        return CustomerUpdateResponse.of(customer);
     }
 
     /**
@@ -145,7 +123,7 @@ public class CustomerService {
      * @return 고객 상태 변경 결과 응답
      */
     @Transactional
-    public AdminApiResponse<CustomerStatusUpdateResponse> updateCustomerStatus(
+    public CustomerStatusUpdateResponse updateCustomerStatus(
             Long customerId,
             CustomerStatusUpdateRequest request
     ) {
@@ -156,16 +134,11 @@ public class CustomerService {
         try {
             status = CustomerStatus.valueOf(request.getStatus().trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw  new ApiException(ErrorCode.INVALID_CUSTOMER_STATUS);
+            throw new ApiException(ErrorCode.INVALID_CUSTOMER_STATUS);
         }
 
         customer.updateStatus(status);
-        CustomerStatusUpdateResponse data = CustomerStatusUpdateResponse.of(customer);
 
-        return AdminApiResponse.success(
-                200,
-                "고객 상태 변경에 성공했습니다.",
-                data
-        );
+        return CustomerStatusUpdateResponse.of(customer);
     }
 }
