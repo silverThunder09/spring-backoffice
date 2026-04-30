@@ -11,6 +11,10 @@
 | 전은기 | [@silverThunder09](https://github.com/silverThunder09) | BE |
 | 임선구 | [@IMSUN9](https://github.com/IMSUN9) | BE |
 
+## ERD
+<img width="2100" height="1202" alt="image" src="https://github.com/user-attachments/assets/b1e8ce22-35f7-4ddb-9463-47b006191892" />
+
+
 ## 프로젝트 노션 바로가기
 [프로젝트 팀 노션 바로가기](https://www.notion.so/teamsparta/3-3432dc3ef51480fe831bed6446644128?source=copy_link)
 
