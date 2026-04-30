@@ -9,13 +9,22 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
 @JsonPropertyOrder
 public class ProductStatusUpdateResponse {
 
     private final Long id;
     private final ProductStatus status;
     private final LocalDateTime updatedAt;
+
+    @Builder
+    public ProductStatusUpdateResponse(
+            Long id,
+            ProductStatus status,
+            LocalDateTime updatedAt) {
+        this.id = id;
+        this.status = status;
+        this.updatedAt = updatedAt;
+    }
 
     public static ProductStatusUpdateResponse of(Product product) {
         return ProductStatusUpdateResponse.builder()

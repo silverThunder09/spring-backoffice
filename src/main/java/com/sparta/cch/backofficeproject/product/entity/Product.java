@@ -96,11 +96,4 @@ public class Product extends BaseEntity {
     public void updateStatus(ProductStatus status) {
         this.status = status;
     }
-
-    /**
-     * 논리 삭제 헬퍼 메서드
-     */
-    public void deleted() {
-        this.deletedAt = LocalDateTime.now();
-    }
 }

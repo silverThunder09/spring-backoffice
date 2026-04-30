@@ -9,7 +9,6 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
 @JsonPropertyOrder({"id", "stock", "status", "updatedAt"})
 public class ProductStockUpdateResponse {
 
@@ -17,6 +16,18 @@ public class ProductStockUpdateResponse {
     private final Integer stock;
     private final ProductStatus status;
     private final LocalDateTime updatedAt;
+
+    @Builder
+    public ProductStockUpdateResponse(
+            Long id,
+            Integer stock,
+            ProductStatus status,
+            LocalDateTime updatedAt) {
+        this.id = id;
+        this.stock = stock;
+        this.status = status;
+        this.updatedAt = updatedAt;
+    }
 
     public static ProductStockUpdateResponse of(Product product) {
         return ProductStockUpdateResponse.builder()
