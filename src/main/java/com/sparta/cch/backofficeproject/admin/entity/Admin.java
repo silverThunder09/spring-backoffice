@@ -1,5 +1,6 @@
 package com.sparta.cch.backofficeproject.admin.entity;
 
+import com.sparta.cch.backofficeproject.admin.dto.AdminSignUpRequest;
 import com.sparta.cch.backofficeproject.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -56,9 +57,9 @@ public class Admin extends BaseEntity {
         this.status = status;
         this.role = role;
     }
-
-    public static Admin signUp(String name, String email, String phone, String password, AdminStatus status, AdminRole role) {
-        return new Admin(name, email, phone, password, status, role);
+    
+    public static Admin signUp(AdminSignUpRequest request, AdminRole role, String encodedPassword) {
+        return new Admin(request.getName(), request.getEmail(), request.getPhone(), encodedPassword, AdminStatus.PENDING, role);
     }
 
     public static Admin createSuperAdmin(String name, String email, String phone, String password) {
