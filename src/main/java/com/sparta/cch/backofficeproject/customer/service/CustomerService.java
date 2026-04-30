@@ -141,4 +141,46 @@ public class CustomerService {
 
         return CustomerStatusUpdateResponse.of(customer);
     }
+
+    /**
+     * 고객 ID로 특정 고객을 삭제합니다.
+     *
+     * <p>고객 ID 유효성을 검증한 뒤 고객을 조회하고,
+     * 이미 탈퇴 처리된 고객인지 확인한 후 soft delete를 수행합니다.</p>
+     *
+     * @param customerId 삭제할 고객 ID
+     * @return 고객 삭제 결과 응답
+     * @throws ApiException 고객 ID가 1 미만이거나 null인 경우 (INVALID_CUSTOMER_ID)
+     * @throws ApiException 이미 탈퇴 처리된 고객인 경우 (INVALID_REQUEST)
+     * @throws ApiException 고객이 존재하지 않는 경우 (CUSTOMER_NOT_FOUND)
+     */
+    @Transactional
+    public CustomerDeleteResponse deleteCustomer(Long customerId) {
+
+        validateCustomerId(customerId);
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> {
+                    if (customerRepository.existsByIdIncludeDeleted(customerId) == 1) {
+                        return new ApiException(ErrorCode.INVALID_REQUEST, "이미 탈퇴 처리된 고객입니다.");
+                    }
+                    return new ApiException(ErrorCode.CUSTOMER_NOT_FOUND);
+                });
+
+        customerRepository.delete(customer);
+
+        return CustomerDeleteResponse.of(customerId);
+    }
+
+    /**
+     * 고객 ID 유효성을 검증합니다.
+     *
+     * @param customerId 검증할 고객 ID
+     * @throws ApiException 고객 ID가 1 미만이거나 null인 경우 (INVALID_CUSTOMER_ID)
+     */
+    private void validateCustomerId(Long customerId) {
+        if (customerId == null || customerId < 1) {
+            throw new ApiException(ErrorCode.INVALID_CUSTOMER_ID);
+        }
+    }
 }

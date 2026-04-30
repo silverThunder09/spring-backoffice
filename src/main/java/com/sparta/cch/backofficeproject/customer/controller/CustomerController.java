@@ -92,14 +92,27 @@ public class CustomerController {
     @PatchMapping("/{customerId}/status")
     public ResponseEntity<CommonResponse<CustomerStatusUpdateResponse>> updateCustomerStatus(
             @PathVariable Long customerId,
-            @Valid @RequestBody CustomerStatusUpdateRequest request
-    ) {
-        CustomerStatusUpdateResponse response =
-                customerService.updateCustomerStatus(customerId, request);
+            @Valid @RequestBody CustomerStatusUpdateRequest request) {
+        CustomerStatusUpdateResponse response = customerService.updateCustomerStatus(customerId, request);
 
         CommonResponse<CustomerStatusUpdateResponse> data = CommonResponse.success(
                 HttpStatus.OK.value(),
                 "고객 상태 변경에 성공했습니다.",
+                response
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(data);
+    }
+
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<CommonResponse<CustomerDeleteResponse>> deleteCustomer (
+            @PathVariable Long customerId) {
+
+        CustomerDeleteResponse response = customerService.deleteCustomer(customerId);
+
+        CommonResponse<CustomerDeleteResponse> data = CommonResponse.success(
+                HttpStatus.OK.value(),
+                "고객 삭제에 성공했습니다.",
                 response
         );
 

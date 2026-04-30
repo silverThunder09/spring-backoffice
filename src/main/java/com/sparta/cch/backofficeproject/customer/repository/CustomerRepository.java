@@ -37,5 +37,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             @Param("status") CustomerStatus status,
             Pageable pageable
     );
+
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM customers WHERE id = :customerId)", nativeQuery = true)
+    int existsByIdIncludeDeleted(@Param("customerId") Long customerId);
 }
 
