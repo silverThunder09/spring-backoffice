@@ -13,7 +13,6 @@ import java.util.Optional;
 
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
-    boolean existsByEmail(String email);
 
     boolean existsByRole(AdminRole role);
 
@@ -45,4 +44,7 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
                              @Param("role") AdminRole role,
                              @Param("status") AdminStatus status,
                              Pageable pageable);
+
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM admins WHERE email = :email)", nativeQuery = true)
+    int existsByEmailIncludeDeleted(@Param("email") String email);
 }

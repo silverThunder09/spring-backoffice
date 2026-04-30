@@ -34,7 +34,7 @@ public class AdminService {
      */
     @Transactional
     public AdminApiResponse<AdminSignUpResponse> signUp(AdminSignUpRequest request) {
-        if (adminRepository.existsByEmail(request.getEmail())) {
+        if (adminRepository.existsByEmailIncludeDeleted(request.getEmail()) == 1) {
             throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
         }
 
@@ -153,7 +153,7 @@ public class AdminService {
 
         // 본인 이메일 제외하고 중복 체크
         if (!admin.getEmail().equals(request.getEmail())
-                && adminRepository.existsByEmail(request.getEmail())) {
+                && adminRepository.existsByEmailIncludeDeleted(request.getEmail()) == 1) {
             throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
         }
 
@@ -299,7 +299,7 @@ public class AdminService {
     }
 
     /**
-     * 특정 관리자를 삭제합니다.
+     * 특정 관리자를 삭제합니다. (Soft Delete)
      * 슈퍼 관리자만 접근할 수 있습니다.
      * 본인 계정은 삭제할 수 없습니다.
      *
@@ -400,5 +400,68 @@ public class AdminService {
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new ApiException(ErrorCode.INVALID_REQUEST, "승인대기 상태의 관리자만 처리할 수 있습니다.");
         }
+    }
+
+    
+    /**
+     * 로그인한 관리자의 내 프로필 정보를 조회합니다.
+     *
+     * <p>세션에 저장된 관리자 ID로 현재 로그인한 관리자를 조회하고,
+     * 조회된 엔티티를 내 프로필 응답 DTO로 변환하여 반환합니다.</p>
+     *
+     * @param sessionAdminId 현재 로그인한 관리자 ID
+     * @return 내 프로필 조회 결과 응답
+     */
+    @Transactional(readOnly = true)
+    public AdminApiResponse<AdminMyProfileResponse> getMyProfile(Long sessionAdminId) {
+
+        Admin admin = findAdminById(sessionAdminId);
+
+        AdminMyProfileResponse data = AdminMyProfileResponse.of(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "내 프로필 조회에 성공했습니다.",
+                data
+        );
+    }
+
+
+    /**
+     * 로그인한 관리자의 내 프로필 정보를 수정합니다.
+     *
+     * <p>세션에 저장된 관리자 ID로 현재 로그인한 관리자를 조회하고,
+     * 이메일 중복 여부를 확인한 뒤 이름, 이메일, 전화번호를 수정합니다.</p>
+     *
+     * @param sessionAdminId 현재 로그인한 관리자 ID
+     * @param request 수정할 이름, 이메일, 전화번호
+     * @return 내 프로필 수정 결과 응답
+     */
+    @Transactional
+    public AdminApiResponse<AdminMyProfileUpdateResponse> updateMyProfile(
+            Long sessionAdminId,
+            AdminMyProfileUpdateRequest request
+    ) {
+        Admin admin = findAdminById(sessionAdminId);
+
+        // 본인 이메일 제외하고 중복 체크
+        if (!admin.getEmail().equals(request.getEmail())
+                && adminRepository.existsByEmailIncludeDeleted(request.getEmail()) == 1) {
+            throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
+        }
+
+        admin.update(
+                request.getName(),
+                request.getEmail(),
+                request.getPhone()
+        );
+
+        AdminMyProfileUpdateResponse data = AdminMyProfileUpdateResponse.of(admin);
+
+        return AdminApiResponse.success(
+                200,
+                "내 프로필 수정에 성공했습니다.",
+                data
+        );
     }
 }
