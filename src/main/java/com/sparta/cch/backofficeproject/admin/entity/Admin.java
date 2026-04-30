@@ -49,6 +49,9 @@ public class Admin extends BaseEntity {
 
     private String rejectReason;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public Admin(String name, String email, String phone, String password, AdminStatus status, AdminRole role) {
         this.name = name;
         this.email = email;
@@ -99,5 +102,7 @@ public class Admin extends BaseEntity {
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
+
+
 
 }
