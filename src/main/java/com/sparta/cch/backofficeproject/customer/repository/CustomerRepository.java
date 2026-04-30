@@ -40,5 +40,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     @Query(value = "SELECT EXISTS(SELECT 1 FROM customers WHERE id = :customerId)", nativeQuery = true)
     int existsByIdIncludeDeleted(@Param("customerId") Long customerId);
+
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM customers WHERE email = :email)", nativeQuery = true)
+    int existsByEmailIncludeDeleted(String email);
 }
 

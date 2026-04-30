@@ -102,9 +102,9 @@ public class CustomerService {
 
         Customer customer = findCustomerById(customerId);
 
-        // 본인 이메일 제외하고 중복 체크
+        // 본인 이메일 제외하고 중복 체크 (소프트 딜리트된 이메일 포함)
         if (!customer.getEmail().equals(request.getEmail())
-                && customerRepository.existsByEmail(request.getEmail())) {
+                && customerRepository.existsByEmailIncludeDeleted(request.getEmail()) == 1) {
             throw new ApiException(ErrorCode.DUPLICATED_EMAIL);
         }
 

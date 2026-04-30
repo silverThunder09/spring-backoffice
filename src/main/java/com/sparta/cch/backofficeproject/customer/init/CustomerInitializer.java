@@ -35,7 +35,7 @@ public class CustomerInitializer implements CommandLineRunner {
             String phone,
             CustomerStatus status
     ) {
-        if (customerRepository.existsByEmail(email)) {
+        if (customerRepository.existsByEmailIncludeDeleted(email) == 1) {
             return;
         }
 
